@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { Settings as SettingsIcon, Wand2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Settings = () => {
   const { toast } = useToast();
+  
   const [companyInfo, setCompanyInfo] = useState({
     name: "My Business",
     address: "123 Business St, Business City",
@@ -72,7 +74,15 @@ const Settings = () => {
       header={
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">Settings</h1>
-          <Button onClick={handleSaveSettings}>Save Changes</Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link to="/customization">
+                <Wand2 className="mr-2 h-4 w-4" />
+                System Customization
+              </Link>
+            </Button>
+            <Button onClick={handleSaveSettings}>Save Changes</Button>
+          </div>
         </div>
       }
     >
