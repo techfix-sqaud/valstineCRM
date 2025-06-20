@@ -95,12 +95,18 @@ const Clients = () => {
   const [clients, setClients] = useState<Client[]>(initialClients);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newClient, setNewClient] = useState({
+  const [newClient, setNewClient] = useState<{
+    name: string;
+    company: string;
+    email: string;
+    phone: string;
+    status: "active" | "inactive" | "lead";
+  }>({
     name: "",
     company: "",
     email: "",
     phone: "",
-    status: "lead" as const,
+    status: "lead",
   });
 
   const filteredClients = clients.filter((client) =>
