@@ -4,6 +4,7 @@ import {
   Menu,
   Moon,
   Sun,
+  Circle,
 } from "lucide-react";
 import * as icons from "lucide-react";
 
@@ -46,8 +47,8 @@ export function AppSidebar() {
   );
 
   const getIcon = (iconName: string) => {
-    const IconComponent = icons[iconName as keyof typeof icons];
-    return IconComponent || icons.Circle;
+    const IconComponent = (icons as any)[iconName];
+    return IconComponent || Circle;
   };
 
   return (

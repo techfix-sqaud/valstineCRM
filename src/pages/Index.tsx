@@ -5,7 +5,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { RecentActivities } from "@/components/dashboard/recent-activities";
 import { SalesChart } from "@/components/dashboard/sales-chart";
 import { UpcomingTasks } from "@/components/dashboard/upcoming-tasks";
-import { Users, FileText, Package, Wallet } from "lucide-react";
+import { Users, FileText, Package, Wallet, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomization } from "@/hooks/useCustomization";
@@ -108,8 +108,8 @@ const Dashboard = () => {
   };
 
   const getIcon = (iconName: string) => {
-    const IconComponent = icons[iconName as keyof typeof icons];
-    return IconComponent || icons.Circle;
+    const IconComponent = (icons as any)[iconName];
+    return IconComponent || Circle;
   };
 
   // Get visible widgets sorted by position
