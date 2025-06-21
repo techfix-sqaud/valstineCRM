@@ -24,10 +24,10 @@ import Layout from "@/components/layout";
 import { useCustomization } from "@/hooks/useCustomization";
 
 export default function Customization() {
-  const { config, updateConfig } = useCustomization();
+  const { config, saveConfig } = useCustomization();
 
   const handleLayoutChange = (navbarPosition: 'sidebar' | 'top') => {
-    updateConfig({
+    saveConfig({
       ...config,
       layout: {
         ...config.layout,
