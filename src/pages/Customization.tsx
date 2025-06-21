@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/tabs";
 import Layout from "@/components/layout";
 import { useCustomization } from "@/hooks/useCustomization";
+import { WorkflowManager } from "@/components/customization/WorkflowManager";
 
 export default function Customization() {
   const { config, saveConfig } = useCustomization();
@@ -104,21 +106,7 @@ export default function Customization() {
           </TabsContent>
 
           <TabsContent value="workflows" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Workflows</CardTitle>
-                <CardDescription>
-                  Automate tasks and processes with custom workflows
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  {/* Example Workflow */}
-                  <Label htmlFor="newClientWorkflow">New Client Workflow</Label>
-                  <Input id="newClientWorkflow" defaultValue="Send Welcome Email" className="mt-2" />
-                </div>
-              </CardContent>
-            </Card>
+            <WorkflowManager />
           </TabsContent>
 
           <TabsContent value="navigation" className="space-y-6">

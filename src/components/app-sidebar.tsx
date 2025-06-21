@@ -1,4 +1,5 @@
 
+
 import {
   LogOut,
   Menu,
@@ -140,7 +141,10 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div 
+            className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer hover:bg-accent rounded-md p-2 transition-colors"
+            onClick={() => navigate('/profile')}
+          >
             <Avatar className="shrink-0">
               <AvatarImage src="/placeholder.svg" alt="User" />
               <AvatarFallback>JD</AvatarFallback>
@@ -158,3 +162,4 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+

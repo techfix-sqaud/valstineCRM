@@ -1,6 +1,7 @@
 
+
 import { useState } from "react";
-import { Menu, Moon, Sun, LogOut, Circle } from "lucide-react";
+import { Menu, Moon, Sun, LogOut, Circle, User } from "lucide-react";
 import * as icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -115,6 +116,14 @@ export function TopNavbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem
+                onClick={() => navigate('/profile')}
+                className="flex items-center gap-2"
+              >
+                <User className="h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               {secondaryNavItems.map((item) => {
                 const IconComponent = getIcon(item.icon);
                 return (
@@ -184,3 +193,4 @@ export function TopNavbar() {
     </nav>
   );
 }
+
