@@ -147,6 +147,9 @@ const defaultConfig: BusinessConfig = {
     secondaryColor: '#64748b',
     companyName: 'My Business',
   },
+  layout: {
+    navbarPosition: 'sidebar',
+  },
 };
 
 export const useCustomization = () => {

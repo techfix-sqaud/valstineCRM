@@ -88,4 +88,7 @@ export interface BusinessConfig {
     logo?: string;
     companyName: string;
   };
+  layout: {
+    navbarPosition: 'sidebar' | 'top';
+  };
 }

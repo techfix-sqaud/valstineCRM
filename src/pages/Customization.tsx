@@ -1,192 +1,226 @@
-
-import Layout from "@/components/layout";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CustomFieldManager } from "@/components/customization/CustomFieldManager";
-import { ViewManager } from "@/components/customization/ViewManager";
-import { WorkflowManager } from "@/components/customization/WorkflowManager";
-import { NavigationManager } from "@/components/customization/NavigationManager";
-import { DashboardManager } from "@/components/customization/DashboardManager";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import Layout from "@/components/layout";
 import { useCustomization } from "@/hooks/useCustomization";
-import { useToast } from "@/hooks/use-toast";
-import { Settings, Palette, Wand2, Eye, Zap, Navigation, LayoutDashboard } from "lucide-react";
 
-const Customization = () => {
-  const { config, saveConfig } = useCustomization();
-  const { toast } = useToast();
+export default function Customization() {
+  const { config, updateConfig } = useCustomization();
 
-  const handleBrandingUpdate = (field: string, value: string) => {
-    const newConfig = {
+  const handleLayoutChange = (navbarPosition: 'sidebar' | 'top') => {
+    updateConfig({
       ...config,
-      branding: {
-        ...config.branding,
-        [field]: value,
+      layout: {
+        ...config.layout,
+        navbarPosition,
       },
-    };
-    saveConfig(newConfig);
-    toast({
-      title: "Branding updated",
-      description: "Your branding settings have been saved",
     });
   };
 
   return (
     <Layout
       header={
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Settings className="h-6 w-6" />
-            <div>
-              <h1 className="text-xl font-bold">System Customization</h1>
-              <p className="text-sm text-muted-foreground">
-                Configure your CRM to match your business needs
-              </p>
-            </div>
-          </div>
+        <div>
+          <h1 className="text-xl font-bold">System Customization</h1>
+          <p className="text-sm text-muted-foreground">
+            Customize your CRM system to fit your business needs
+          </p>
         </div>
       }
     >
       <div className="space-y-6">
-        <Tabs defaultValue="fields" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 overflow-x-auto">
-            <TabsTrigger value="fields" className="flex items-center gap-2">
-              <Wand2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Fields</span>
-            </TabsTrigger>
-            <TabsTrigger value="views" className="flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              <span className="hidden sm:inline">Views</span>
-            </TabsTrigger>
-            <TabsTrigger value="navigation" className="flex items-center gap-2">
-              <Navigation className="h-4 w-4" />
-              <span className="hidden sm:inline">Navigation</span>
-            </TabsTrigger>
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <LayoutDashboard className="h-4 w-4" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </TabsTrigger>
-            <TabsTrigger value="workflows" className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              <span className="hidden sm:inline">Workflows</span>
-            </TabsTrigger>
-            <TabsTrigger value="branding" className="flex items-center gap-2">
-              <Palette className="h-4 w-4" />
-              <span className="hidden sm:inline">Branding</span>
-            </TabsTrigger>
-            <TabsTrigger value="permissions" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Permissions</span>
-            </TabsTrigger>
+        <Tabs defaultValue="fields" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="fields">Custom Fields</TabsTrigger>
+            <TabsTrigger value="views">Views</TabsTrigger>
+            <TabsTrigger value="workflows">Workflows</TabsTrigger>
+            <TabsTrigger value="navigation">Navigation</TabsTrigger>
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="layout">Layout</TabsTrigger>
           </TabsList>
 
           <TabsContent value="fields" className="space-y-6">
-            <div className="grid gap-6">
-              <CustomFieldManager entityType="client" />
-              <CustomFieldManager entityType="invoice" />
-              <CustomFieldManager entityType="inventory" />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="views">
-            <ViewManager />
-          </TabsContent>
-
-          <TabsContent value="navigation">
-            <NavigationManager />
-          </TabsContent>
-
-          <TabsContent value="dashboard">
-            <DashboardManager />
-          </TabsContent>
-
-          <TabsContent value="workflows">
-            <WorkflowManager />
-          </TabsContent>
-
-          <TabsContent value="branding">
             <Card>
               <CardHeader>
-                <CardTitle>Brand Configuration</CardTitle>
+                <CardTitle>Custom Fields</CardTitle>
                 <CardDescription>
-                  Customize the appearance and branding of your CRM
+                  Manage custom fields for different entities in your CRM
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="companyName">Company Name</Label>
-                    <Input
-                      id="companyName"
-                      value={config.branding.companyName}
-                      onChange={(e) => handleBrandingUpdate('companyName', e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="primaryColor">Primary Color</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="primaryColor"
-                        type="color"
-                        value={config.branding.primaryColor}
-                        onChange={(e) => handleBrandingUpdate('primaryColor', e.target.value)}
-                        className="w-20"
-                      />
-                      <Input
-                        value={config.branding.primaryColor}
-                        onChange={(e) => handleBrandingUpdate('primaryColor', e.target.value)}
-                        placeholder="#3b82f6"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="secondaryColor">Secondary Color</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="secondaryColor"
-                        type="color"
-                        value={config.branding.secondaryColor}
-                        onChange={(e) => handleBrandingUpdate('secondaryColor', e.target.value)}
-                        className="w-20"
-                      />
-                      <Input
-                        value={config.branding.secondaryColor}
-                        onChange={(e) => handleBrandingUpdate('secondaryColor', e.target.value)}
-                        placeholder="#64748b"
-                      />
-                    </div>
-                  </div>
+                <div>
+                  {/* Example Custom Field */}
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <Input id="companyName" defaultValue="Acme Inc." className="mt-2" />
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="permissions">
+          <TabsContent value="views" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>User Permissions</CardTitle>
+                <CardTitle>Views</CardTitle>
                 <CardDescription>
-                  Configure user roles and permissions
+                  Customize the views for different entities in your CRM
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-6">
+                <div>
+                  {/* Example View */}
+                  <Label htmlFor="defaultView">Default View</Label>
+                  <Select>
+                    <SelectTrigger className="mt-2 w-full">
+                      <SelectValue placeholder="Clients" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="clients">Clients</SelectItem>
+                      <SelectItem value="invoices">Invoices</SelectItem>
+                      <SelectItem value="inventory">Inventory</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="workflows" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Workflows</CardTitle>
+                <CardDescription>
+                  Automate tasks and processes with custom workflows
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  {/* Example Workflow */}
+                  <Label htmlFor="newClientWorkflow">New Client Workflow</Label>
+                  <Input id="newClientWorkflow" defaultValue="Send Welcome Email" className="mt-2" />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="navigation" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Navigation</CardTitle>
+                <CardDescription>
+                  Customize the navigation menu for your CRM
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  {/* Example Navigation Item */}
+                  <Label htmlFor="dashboardLink">Dashboard Link</Label>
+                  <Input id="dashboardLink" defaultValue="Dashboard" className="mt-2" />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="dashboard" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Dashboard</CardTitle>
+                <CardDescription>
+                  Customize the widgets and layout of your dashboard
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  {/* Example Dashboard Widget */}
+                  <Label htmlFor="salesWidget">Sales Widget</Label>
+                  <Input id="salesWidget" defaultValue="Sales Chart" className="mt-2" />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="layout" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Layout Configuration</CardTitle>
+                <CardDescription>
+                  Configure the overall layout and navigation style of your CRM
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  {Object.entries(config.permissions).map(([role, permissions]) => (
-                    <div key={role} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <p className="font-medium capitalize">{role}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {permissions.join(', ')}
-                        </p>
+                  <h3 className="text-lg font-medium">Navigation Position</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div
+                      className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                        config.layout.navbarPosition === 'sidebar'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                      onClick={() => handleLayoutChange('sidebar')}
+                    >
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className="w-4 h-4 rounded-full border-2 border-primary">
+                          {config.layout.navbarPosition === 'sidebar' && (
+                            <div className="w-2 h-2 rounded-full bg-primary m-0.5" />
+                          )}
+                        </div>
+                        <h4 className="font-medium">Sidebar Navigation</h4>
                       </div>
-                      <button className="px-3 py-1 text-sm border rounded hover:bg-gray-50">
-                        Configure
-                      </button>
+                      <p className="text-sm text-muted-foreground">
+                        Traditional sidebar layout with collapsible navigation
+                      </p>
+                      <div className="mt-3 border rounded p-2 bg-muted/30">
+                        <div className="flex">
+                          <div className="w-12 bg-primary/20 h-8 rounded-sm mr-2"></div>
+                          <div className="flex-1 bg-muted h-8 rounded-sm"></div>
+                        </div>
+                      </div>
                     </div>
-                  ))}
+
+                    <div
+                      className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                        config.layout.navbarPosition === 'top'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                      onClick={() => handleLayoutChange('top')}
+                    >
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className="w-4 h-4 rounded-full border-2 border-primary">
+                          {config.layout.navbarPosition === 'top' && (
+                            <div className="w-2 h-2 rounded-full bg-primary m-0.5" />
+                          )}
+                        </div>
+                        <h4 className="font-medium">Top Navigation</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Modern top navigation bar with dropdown menus
+                      </p>
+                      <div className="mt-3 border rounded p-2 bg-muted/30">
+                        <div className="bg-primary/20 h-3 rounded-sm mb-2"></div>
+                        <div className="bg-muted h-8 rounded-sm"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -195,6 +229,4 @@ const Customization = () => {
       </div>
     </Layout>
   );
-};
-
-export default Customization;
+}
