@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -20,24 +21,59 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Layout from "@/components/layout";
 import { useCustomization } from "@/hooks/useCustomization";
 import { WorkflowManager } from "@/components/customization/WorkflowManager";
+import { DashboardManager } from "@/components/customization/DashboardManager";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Customization() {
   const { config, saveConfig } = useCustomization();
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [pendingNavbarPosition, setPendingNavbarPosition] = useState<'sidebar' | 'top' | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleLayoutChange = (navbarPosition: 'sidebar' | 'top') => {
+    if (config.layout.navbarPosition !== navbarPosition) {
+      setPendingNavbarPosition(navbarPosition);
+      setSaveDialogOpen(true);
+    }
+  };
+
+  const confirmLayoutChange = async () => {
+    if (!pendingNavbarPosition) return;
+    
+    setIsSaving(true);
+    
     const newConfig = {
       ...config,
       layout: {
         ...config.layout,
-        navbarPosition,
+        navbarPosition: pendingNavbarPosition,
       },
     };
+    
     saveConfig(newConfig);
+    
+    // Simulate saving delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setIsSaving(false);
+    setSaveDialogOpen(false);
+    setPendingNavbarPosition(null);
+    
+    toast({
+      title: t('layout-updated'),
+      description: t('changes-saved'),
+    });
+    
+    // Refresh the page to apply layout changes
+    window.location.reload();
   };
 
   return (
@@ -54,11 +90,11 @@ export default function Customization() {
       <div className="space-y-6">
         <Tabs defaultValue="fields" className="w-full">
           <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="fields">Custom Fields</TabsTrigger>
-            <TabsTrigger value="views">Views</TabsTrigger>
-            <TabsTrigger value="workflows">Workflows</TabsTrigger>
-            <TabsTrigger value="navigation">Navigation</TabsTrigger>
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="fields">{t('custom-fields')}</TabsTrigger>
+            <TabsTrigger value="views">{t('views')}</TabsTrigger>
+            <TabsTrigger value="workflows">{t('workflows')}</TabsTrigger>
+            <TabsTrigger value="navigation">{t('navigation')}</TabsTrigger>
+            <TabsTrigger value="dashboard">{t('dashboard')}</TabsTrigger>
             <TabsTrigger value="layout">{t('layout')}</TabsTrigger>
           </TabsList>
 
@@ -130,21 +166,7 @@ export default function Customization() {
           </TabsContent>
 
           <TabsContent value="dashboard" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Dashboard</CardTitle>
-                <CardDescription>
-                  Customize the widgets and layout of your dashboard
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  {/* Example Dashboard Widget */}
-                  <Label htmlFor="salesWidget">Sales Widget</Label>
-                  <Input id="salesWidget" defaultValue="Sales Chart" className="mt-2" />
-                </div>
-              </CardContent>
-            </Card>
+            <DashboardManager />
           </TabsContent>
 
           <TabsContent value="layout" className="space-y-6">
@@ -217,6 +239,26 @@ export default function Customization() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Save Confirmation Dialog */}
+      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('layout-updated')}</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to change the navigation layout? This will refresh the page to apply changes.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSaveDialogOpen(false)} disabled={isSaving}>
+              {t('cancel')}
+            </Button>
+            <Button onClick={confirmLayoutChange} disabled={isSaving}>
+              {isSaving ? t('saving') : t('save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Plus, Edit, GripVertical, Eye, EyeOff } from "lucide-react";
+import { Trash2, Plus, Edit, Eye, EyeOff } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DashboardWidget } from "@/types/customization";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useToast } from "@/hooks/use-toast";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const widgetTypes = [
   { value: 'stat', label: 'Statistic Card' },
@@ -30,6 +30,7 @@ const widgetSizes = [
 export const DashboardManager = () => {
   const { config, addWidget, updateWidget, deleteWidget } = useCustomization();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingWidget, setEditingWidget] = useState<DashboardWidget | null>(null);
   const [newWidget, setNewWidget] = useState<Partial<DashboardWidget>>({
@@ -112,14 +113,14 @@ export const DashboardManager = () => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Dashboard Widgets</CardTitle>
+            <CardTitle>{t('dashboard-widgets')}</CardTitle>
             <CardDescription>
               Manage dashboard widgets and their visibility
             </CardDescription>
           </div>
           <Button onClick={() => setIsDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Widget
+            {t('add-widget')}
           </Button>
         </div>
       </CardHeader>
@@ -171,7 +172,7 @@ export const DashboardManager = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingWidget ? "Edit Widget" : "Add Widget"}
+              {editingWidget ? t('edit-widget') : t('add-widget')}
             </DialogTitle>
             <DialogDescription>
               Configure the widget properties
@@ -179,7 +180,7 @@ export const DashboardManager = () => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-right">Title</Label>
+              <Label htmlFor="title" className="text-right">{t('widget-title')}</Label>
               <Input
                 id="title"
                 value={newWidget.title || ""}
@@ -189,7 +190,7 @@ export const DashboardManager = () => {
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="type" className="text-right">Type</Label>
+              <Label htmlFor="type" className="text-right">{t('widget-type')}</Label>
               <Select
                 value={newWidget.type}
                 onValueChange={(value) => setNewWidget({ ...newWidget, type: value as any })}
@@ -207,7 +208,7 @@ export const DashboardManager = () => {
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="size" className="text-right">Size</Label>
+              <Label htmlFor="size" className="text-right">{t('widget-size')}</Label>
               <Select
                 value={newWidget.size}
                 onValueChange={(value) => setNewWidget({ ...newWidget, size: value as any })}
@@ -218,27 +219,59 @@ export const DashboardManager = () => {
                 <SelectContent>
                   {widgetSizes.map((size) => (
                     <SelectItem key={size.value} value={size.value}>
-                      {size.label}
+                      {t(size.value)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="visible" className="text-right">Visible</Label>
+              <Label htmlFor="visible" className="text-right">{t('widget-visible')}</Label>
               <Switch
                 id="visible"
                 checked={newWidget.visible ?? true}
                 onCheckedChange={(visible) => setNewWidget({ ...newWidget, visible })}
               />
             </div>
+            
+            {/* Additional configuration based on widget type */}
+            {newWidget.type === 'stat' && (
+              <>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="value" className="text-right">Value</Label>
+                  <Input
+                    id="value"
+                    value={newWidget.config?.value || ""}
+                    onChange={(e) => setNewWidget({ 
+                      ...newWidget, 
+                      config: { ...newWidget.config, value: e.target.value }
+                    })}
+                    className="col-span-3"
+                    placeholder="e.g., 145"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="icon" className="text-right">Icon</Label>
+                  <Input
+                    id="icon"
+                    value={newWidget.config?.icon || ""}
+                    onChange={(e) => setNewWidget({ 
+                      ...newWidget, 
+                      config: { ...newWidget.config, icon: e.target.value }
+                    })}
+                    className="col-span-3"
+                    placeholder="e.g., Users"
+                  />
+                </div>
+              </>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button onClick={handleSaveWidget}>
-              {editingWidget ? "Update" : "Create"} Widget
+              {editingWidget ? t('update') : t('create')} Widget
             </Button>
           </DialogFooter>
         </DialogContent>

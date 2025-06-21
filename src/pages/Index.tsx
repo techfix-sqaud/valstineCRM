@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import Layout from "@/components/layout";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { RecentActivities } from "@/components/dashboard/recent-activities";
 import { SalesChart } from "@/components/dashboard/sales-chart";
 import { UpcomingTasks } from "@/components/dashboard/upcoming-tasks";
+import { AutomationConfig } from "@/components/automation/AutomationConfig";
 import { Users, FileText, Package, Wallet, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +17,7 @@ const Dashboard = () => {
   const { toast } = useToast();
   const { config } = useCustomization();
   const { t } = useLanguage();
+  const [automationConfigOpen, setAutomationConfigOpen] = useState(false);
   
   const [tasks, setTasks] = useState([
     {
@@ -96,13 +99,18 @@ const Dashboard = () => {
     const task = tasks.find((t) => t.id === id);
     if (task && completed) {
       toast({
-        title: "Task completed",
+        title: t('task-completed'),
         description: `"${task.title}" marked as complete`,
       });
     }
   };
 
   const handleRunAutomation = () => {
+    setAutomationConfigOpen(true);
+  };
+
+  const handleAutomationSave = (automationConfig: any) => {
+    console.log('Automation config saved:', automationConfig);
     toast({
       title: t('automation-running'),
       description: t('client-followup-emails'),
@@ -190,6 +198,12 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+      
+      <AutomationConfig
+        open={automationConfigOpen}
+        onOpenChange={setAutomationConfigOpen}
+        onSave={handleAutomationSave}
+      />
     </Layout>
   );
 };
