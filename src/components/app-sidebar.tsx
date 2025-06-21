@@ -1,15 +1,11 @@
 
 import {
-  Users,
-  FileText,
-  Package,
-  BarChart3,
-  Settings,
-  Home,
-  CreditCard,
   LogOut,
   Menu,
+  Moon,
+  Sun,
 } from "lucide-react";
+import * as icons from "lucide-react";
 
 import {
   Sidebar,
@@ -29,52 +25,30 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
-import { Moon, Sun } from "lucide-react";
+import { useCustomization } from "@/hooks/useCustomization";
 
 export function AppSidebar() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const { config } = useCustomization();
 
-  const menuItems = [
-    {
-      title: "Dashboard",
-      icon: Home,
-      path: "/",
-    },
-    {
-      title: "Clients",
-      icon: Users,
-      path: "/clients",
-    },
-    {
-      title: "Invoices",
-      icon: FileText,
-      path: "/invoices",
-    },
-    {
-      title: "Inventory",
-      icon: Package,
-      path: "/inventory",
-    },
-    {
-      title: "Reports",
-      icon: BarChart3,
-      path: "/reports",
-    },
-  ];
+  // Get visible navigation items sorted by order
+  const visibleNavItems = config.navigation
+    .filter(item => item.visible)
+    .sort((a, b) => a.order - b.order);
 
-  const secondaryMenuItems = [
-    {
-      title: "Settings",
-      icon: Settings,
-      path: "/settings",
-    },
-    {
-      title: "Billing",
-      icon: CreditCard,
-      path: "/billing",
-    },
-  ];
+  const mainNavItems = visibleNavItems.filter(item => 
+    !['settings', 'billing'].includes(item.id)
+  );
+
+  const secondaryNavItems = visibleNavItems.filter(item => 
+    ['settings', 'billing'].includes(item.id)
+  );
+
+  const getIcon = (iconName: string) => {
+    const IconComponent = icons[iconName as keyof typeof icons];
+    return IconComponent || icons.Circle;
+  };
 
   return (
     <Sidebar>
@@ -96,9 +70,9 @@ export function AppSidebar() {
                 </svg>
               </div>
             </div>
-            <span className="text-lg font-bold">Business CRM</span>
+            <span className="text-lg font-bold truncate">{config.branding.companyName}</span>
           </div>
-          <SidebarTrigger>
+          <SidebarTrigger className="md:hidden">
             <Menu className="h-5 w-5" />
           </SidebarTrigger>
         </div>
@@ -109,17 +83,20 @@ export function AppSidebar() {
           <SidebarGroupLabel>Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton
-                    onClick={() => navigate(item.path)}
-                    className="flex items-center gap-3"
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {mainNavItems.map((item) => {
+                const IconComponent = getIcon(item.icon);
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      onClick={() => navigate(item.path)}
+                      className="flex items-center gap-3 w-full"
+                    >
+                      <IconComponent className="h-5 w-5 shrink-0" />
+                      <span className="truncate">{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -128,28 +105,31 @@ export function AppSidebar() {
           <SidebarGroupLabel>Account</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {secondaryMenuItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton
-                    onClick={() => navigate(item.path)}
-                    className="flex items-center gap-3"
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {secondaryNavItems.map((item) => {
+                const IconComponent = getIcon(item.icon);
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      onClick={() => navigate(item.path)}
+                      className="flex items-center gap-3 w-full"
+                    >
+                      <IconComponent className="h-5 w-5 shrink-0" />
+                      <span className="truncate">{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="flex items-center gap-3"
+                  className="flex items-center gap-3 w-full"
                 >
                   {theme === "dark" ? (
-                    <Sun className="h-5 w-5" />
+                    <Sun className="h-5 w-5 shrink-0" />
                   ) : (
-                    <Moon className="h-5 w-5" />
+                    <Moon className="h-5 w-5 shrink-0" />
                   )}
-                  <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                  <span className="truncate">{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -159,17 +139,17 @@ export function AppSidebar() {
 
       <SidebarFooter>
         <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <Avatar>
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <Avatar className="shrink-0">
               <AvatarImage src="/placeholder.svg" alt="User" />
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
-            <div>
-              <p className="text-sm font-medium">John Doe</p>
-              <p className="text-xs text-muted-foreground">Admin</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium truncate">John Doe</p>
+              <p className="text-xs text-muted-foreground truncate">Admin</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="shrink-0">
             <LogOut className="h-5 w-5" />
           </Button>
         </div>

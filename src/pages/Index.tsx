@@ -8,9 +8,12 @@ import { UpcomingTasks } from "@/components/dashboard/upcoming-tasks";
 import { Users, FileText, Package, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useCustomization } from "@/hooks/useCustomization";
+import * as icons from "lucide-react";
 
 const Dashboard = () => {
   const { toast } = useToast();
+  const { config } = useCustomization();
   const [tasks, setTasks] = useState([
     {
       id: 1,
@@ -104,6 +107,57 @@ const Dashboard = () => {
     });
   };
 
+  const getIcon = (iconName: string) => {
+    const IconComponent = icons[iconName as keyof typeof icons];
+    return IconComponent || icons.Circle;
+  };
+
+  // Get visible widgets sorted by position
+  const visibleWidgets = config.dashboardWidgets
+    .filter(widget => widget.visible)
+    .sort((a, b) => a.position.y - b.position.y || a.position.x - b.position.x);
+
+  const renderWidget = (widget: any) => {
+    switch (widget.type) {
+      case 'stat':
+        const IconComponent = getIcon(widget.config.icon || 'Circle');
+        return (
+          <StatCard
+            key={widget.id}
+            title={widget.title}
+            value={widget.config.value || "0"}
+            icon={<IconComponent className="h-5 w-5" />}
+            change={widget.config.change}
+          />
+        );
+      case 'chart':
+        return (
+          <div key={widget.id} className={widget.size === 'large' ? 'col-span-2' : ''}>
+            <SalesChart />
+          </div>
+        );
+      case 'activity':
+        return (
+          <div key={widget.id}>
+            <RecentActivities activities={recentActivities} />
+          </div>
+        );
+      case 'tasks':
+        return (
+          <div key={widget.id} className={widget.size === 'large' ? 'col-span-full' : ''}>
+            <UpcomingTasks tasks={tasks} onTaskComplete={handleTaskComplete} />
+          </div>
+        );
+      default:
+        return (
+          <div key={widget.id} className="p-4 border rounded-lg">
+            <h3 className="font-medium">{widget.title}</h3>
+            <p className="text-sm text-muted-foreground">Custom widget content</p>
+          </div>
+        );
+    }
+  };
+
   return (
     <Layout
       header={
@@ -114,50 +168,29 @@ const Dashboard = () => {
               Welcome back, here's an overview of your business
             </p>
           </div>
-          <Button onClick={handleRunAutomation}>Run Automation</Button>
+          <Button onClick={handleRunAutomation} className="hidden sm:flex">
+            Run Automation
+          </Button>
         </div>
       }
     >
-      <div className="grid gap-6">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            title="Total Clients"
-            value="145"
-            icon={<Users className="h-5 w-5" />}
-            change={{ value: "12%", positive: true }}
-          />
-          <StatCard
-            title="Invoices Pending"
-            value="23"
-            icon={<FileText className="h-5 w-5" />}
-            change={{ value: "5%", positive: false }}
-          />
-          <StatCard
-            title="Inventory Items"
-            value="738"
-            icon={<Package className="h-5 w-5" />}
-            change={{ value: "8%", positive: true }}
-          />
-          <StatCard
-            title="Total Revenue"
-            value="$38,500"
-            icon={<Wallet className="h-5 w-5" />}
-            change={{ value: "15%", positive: true }}
-          />
+      <div className="space-y-6">
+        {/* Responsive grid for widgets */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-min">
+          {visibleWidgets.map(renderWidget)}
         </div>
         
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="col-span-2">
-            <SalesChart />
+        {visibleWidgets.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              No widgets configured. Go to{" "}
+              <a href="/customization" className="text-primary hover:underline">
+                System Customization
+              </a>{" "}
+              to add widgets.
+            </p>
           </div>
-          <div>
-            <RecentActivities activities={recentActivities} />
-          </div>
-        </div>
-        
-        <div>
-          <UpcomingTasks tasks={tasks} onTaskComplete={handleTaskComplete} />
-        </div>
+        )}
       </div>
     </Layout>
   );

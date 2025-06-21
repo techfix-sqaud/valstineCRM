@@ -6,11 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Trash2, Plus, Edit, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ViewConfig } from "@/types/customization";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useToast } from "@/hooks/use-toast";
+
+const commonIcons = [
+  'Eye', 'Users', 'FileText', 'Package', 'BarChart3', 'Calendar', 'Mail', 
+  'Phone', 'MapPin', 'Search', 'Star', 'Heart', 'Bookmark', 'Tag', 'Folder'
+];
 
 export const ViewManager = () => {
   const { config, addView, updateView, deleteView } = useCustomization();
@@ -23,6 +29,8 @@ export const ViewManager = () => {
     columns: [],
     filters: [],
     isDefault: false,
+    showInNavigation: false,
+    navigationIcon: "Eye",
   });
 
   const handleSaveView = () => {
@@ -42,6 +50,9 @@ export const ViewManager = () => {
       columns: newView.columns || [],
       filters: newView.filters || [],
       isDefault: newView.isDefault || false,
+      showInNavigation: newView.showInNavigation || false,
+      navigationIcon: newView.navigationIcon || "Eye",
+      navigationOrder: newView.navigationOrder,
       sortBy: newView.sortBy,
       sortOrder: newView.sortOrder,
     };
@@ -68,6 +79,8 @@ export const ViewManager = () => {
       columns: [],
       filters: [],
       isDefault: false,
+      showInNavigation: false,
+      navigationIcon: "Eye",
     });
   };
 
@@ -118,6 +131,7 @@ export const ViewManager = () => {
                     <p className="text-sm text-muted-foreground">
                       {view.entityType} • {view.columns.length} columns
                       {view.isDefault && " • Default"}
+                      {view.showInNavigation && " • In Navigation"}
                     </p>
                   </div>
                 </div>
@@ -150,7 +164,7 @@ export const ViewManager = () => {
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingView ? "Edit View" : "Create Custom View"}
@@ -187,9 +201,10 @@ export const ViewManager = () => {
                 </SelectContent>
               </Select>
             </div>
+            
             <div className="grid grid-cols-4 items-start gap-4">
               <Label className="text-right">Columns</Label>
-              <div className="col-span-3 space-y-2 max-h-40 overflow-y-auto">
+              <div className="col-span-3 space-y-2 max-h-40 overflow-y-auto border rounded p-2">
                 {availableFields.map((field) => (
                   <div key={field.id} className="flex items-center space-x-2">
                     <Checkbox
@@ -204,11 +219,12 @@ export const ViewManager = () => {
                         }
                       }}
                     />
-                    <Label htmlFor={field.id}>{field.label}</Label>
+                    <Label htmlFor={field.id} className="text-sm">{field.label}</Label>
                   </div>
                 ))}
               </div>
             </div>
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Default View</Label>
               <Checkbox
@@ -216,6 +232,48 @@ export const ViewManager = () => {
                 onCheckedChange={(isDefault) => setNewView({ ...newView, isDefault: !!isDefault })}
               />
             </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Show in Navigation</Label>
+              <Switch
+                checked={newView.showInNavigation || false}
+                onCheckedChange={(showInNavigation) => setNewView({ ...newView, showInNavigation })}
+              />
+            </div>
+
+            {newView.showInNavigation && (
+              <>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="navIcon" className="text-right">Navigation Icon</Label>
+                  <Select
+                    value={newView.navigationIcon}
+                    onValueChange={(value) => setNewView({ ...newView, navigationIcon: value })}
+                  >
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {commonIcons.map((icon) => (
+                        <SelectItem key={icon} value={icon}>
+                          {icon}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="navOrder" className="text-right">Navigation Order</Label>
+                  <Input
+                    id="navOrder"
+                    type="number"
+                    value={newView.navigationOrder || ""}
+                    onChange={(e) => setNewView({ ...newView, navigationOrder: parseInt(e.target.value) })}
+                    className="col-span-3"
+                    placeholder="Order (optional)"
+                  />
+                </div>
+              </>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>

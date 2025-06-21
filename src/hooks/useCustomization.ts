@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { BusinessConfig, CustomField, ViewConfig, WorkflowConfig } from '@/types/customization';
+import { BusinessConfig, CustomField, ViewConfig, WorkflowConfig, NavigationItem, DashboardWidget } from '@/types/customization';
 
 const defaultConfig: BusinessConfig = {
   customFields: {
@@ -64,6 +63,80 @@ const defaultConfig: BusinessConfig = {
     },
   ],
   workflows: [],
+  navigation: [
+    { id: 'dashboard', title: 'Dashboard', path: '/', icon: 'Home', order: 1, visible: true },
+    { id: 'clients', title: 'Clients', path: '/clients', icon: 'Users', order: 2, visible: true },
+    { id: 'invoices', title: 'Invoices', path: '/invoices', icon: 'FileText', order: 3, visible: true },
+    { id: 'inventory', title: 'Inventory', path: '/inventory', icon: 'Package', order: 4, visible: true },
+    { id: 'reports', title: 'Reports', path: '/reports', icon: 'BarChart3', order: 5, visible: true },
+    { id: 'settings', title: 'Settings', path: '/settings', icon: 'Settings', order: 6, visible: true },
+    { id: 'billing', title: 'Billing', path: '/billing', icon: 'CreditCard', order: 7, visible: true },
+  ],
+  dashboardWidgets: [
+    {
+      id: 'total-clients',
+      type: 'stat',
+      title: 'Total Clients',
+      size: 'small',
+      position: { x: 0, y: 0 },
+      visible: true,
+      config: { value: '145', icon: 'Users', change: { value: '12%', positive: true } }
+    },
+    {
+      id: 'pending-invoices',
+      type: 'stat',
+      title: 'Invoices Pending',
+      size: 'small',
+      position: { x: 1, y: 0 },
+      visible: true,
+      config: { value: '23', icon: 'FileText', change: { value: '5%', positive: false } }
+    },
+    {
+      id: 'inventory-items',
+      type: 'stat',
+      title: 'Inventory Items',
+      size: 'small',
+      position: { x: 2, y: 0 },
+      visible: true,
+      config: { value: '738', icon: 'Package', change: { value: '8%', positive: true } }
+    },
+    {
+      id: 'total-revenue',
+      type: 'stat',
+      title: 'Total Revenue',
+      size: 'small',
+      position: { x: 3, y: 0 },
+      visible: true,
+      config: { value: '$38,500', icon: 'Wallet', change: { value: '15%', positive: true } }
+    },
+    {
+      id: 'sales-chart',
+      type: 'chart',
+      title: 'Sales Overview',
+      size: 'large',
+      position: { x: 0, y: 1 },
+      visible: true,
+      config: { chartType: 'line' }
+    },
+    {
+      id: 'recent-activities',
+      type: 'activity',
+      title: 'Recent Activities',
+      size: 'medium',
+      position: { x: 2, y: 1 },
+      visible: true,
+      config: {}
+    },
+    {
+      id: 'upcoming-tasks',
+      type: 'tasks',
+      title: 'Upcoming Tasks',
+      size: 'large',
+      position: { x: 0, y: 2 },
+      visible: true,
+      config: {}
+    }
+  ],
   permissions: {
     admin: ['create', 'read', 'update', 'delete', 'customize'],
     user: ['create', 'read', 'update'],
@@ -84,7 +157,9 @@ export const useCustomization = () => {
     const savedConfig = localStorage.getItem('business-config');
     if (savedConfig) {
       try {
-        setConfig(JSON.parse(savedConfig));
+        const parsed = JSON.parse(savedConfig);
+        // Merge with default to ensure new properties are included
+        setConfig({ ...defaultConfig, ...parsed });
       } catch (error) {
         console.error('Failed to parse saved config:', error);
       }
@@ -126,6 +201,22 @@ export const useCustomization = () => {
   const addView = (view: ViewConfig) => {
     const newConfig = { ...config };
     newConfig.views.push(view);
+    
+    // If view should be shown in navigation, add it
+    if (view.showInNavigation) {
+      const navItem: NavigationItem = {
+        id: `view-${view.id}`,
+        title: view.name,
+        path: `/view/${view.id}`,
+        icon: view.navigationIcon || 'Eye',
+        order: view.navigationOrder || newConfig.navigation.length + 1,
+        visible: true,
+        isCustom: true,
+        viewId: view.id
+      };
+      newConfig.navigation.push(navItem);
+    }
+    
     saveConfig(newConfig);
   };
 
@@ -133,7 +224,37 @@ export const useCustomization = () => {
     const newConfig = { ...config };
     const viewIndex = newConfig.views.findIndex(v => v.id === viewId);
     if (viewIndex >= 0) {
-      newConfig.views[viewIndex] = { ...newConfig.views[viewIndex], ...updates };
+      const oldView = newConfig.views[viewIndex];
+      newConfig.views[viewIndex] = { ...oldView, ...updates };
+      
+      // Update corresponding navigation item
+      const navIndex = newConfig.navigation.findIndex(n => n.viewId === viewId);
+      if (updates.showInNavigation && navIndex === -1) {
+        // Add to navigation
+        const navItem: NavigationItem = {
+          id: `view-${viewId}`,
+          title: updates.name || oldView.name,
+          path: `/view/${viewId}`,
+          icon: updates.navigationIcon || oldView.navigationIcon || 'Eye',
+          order: updates.navigationOrder || newConfig.navigation.length + 1,
+          visible: true,
+          isCustom: true,
+          viewId: viewId
+        };
+        newConfig.navigation.push(navItem);
+      } else if (!updates.showInNavigation && navIndex >= 0) {
+        // Remove from navigation
+        newConfig.navigation.splice(navIndex, 1);
+      } else if (navIndex >= 0) {
+        // Update navigation item
+        newConfig.navigation[navIndex] = {
+          ...newConfig.navigation[navIndex],
+          title: updates.name || newConfig.navigation[navIndex].title,
+          icon: updates.navigationIcon || newConfig.navigation[navIndex].icon,
+          order: updates.navigationOrder || newConfig.navigation[navIndex].order
+        };
+      }
+      
       saveConfig(newConfig);
     }
   };
@@ -141,6 +262,8 @@ export const useCustomization = () => {
   const deleteView = (viewId: string) => {
     const newConfig = { ...config };
     newConfig.views = newConfig.views.filter(v => v.id !== viewId);
+    // Remove from navigation if exists
+    newConfig.navigation = newConfig.navigation.filter(n => n.viewId !== viewId);
     saveConfig(newConfig);
   };
 
@@ -165,6 +288,35 @@ export const useCustomization = () => {
     saveConfig(newConfig);
   };
 
+  // Navigation methods
+  const updateNavigation = (items: NavigationItem[]) => {
+    const newConfig = { ...config };
+    newConfig.navigation = items;
+    saveConfig(newConfig);
+  };
+
+  // Widget methods
+  const addWidget = (widget: DashboardWidget) => {
+    const newConfig = { ...config };
+    newConfig.dashboardWidgets.push(widget);
+    saveConfig(newConfig);
+  };
+
+  const updateWidget = (widgetId: string, updates: Partial<DashboardWidget>) => {
+    const newConfig = { ...config };
+    const widgetIndex = newConfig.dashboardWidgets.findIndex(w => w.id === widgetId);
+    if (widgetIndex >= 0) {
+      newConfig.dashboardWidgets[widgetIndex] = { ...newConfig.dashboardWidgets[widgetIndex], ...updates };
+      saveConfig(newConfig);
+    }
+  };
+
+  const deleteWidget = (widgetId: string) => {
+    const newConfig = { ...config };
+    newConfig.dashboardWidgets = newConfig.dashboardWidgets.filter(w => w.id !== widgetId);
+    saveConfig(newConfig);
+  };
+
   return {
     config,
     saveConfig,
@@ -177,5 +329,9 @@ export const useCustomization = () => {
     addWorkflow,
     updateWorkflow,
     deleteWorkflow,
+    updateNavigation,
+    addWidget,
+    updateWidget,
+    deleteWidget,
   };
 };
