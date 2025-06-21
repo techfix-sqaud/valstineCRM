@@ -1,11 +1,11 @@
 
-
 import {
   LogOut,
   Menu,
   Moon,
   Sun,
   Circle,
+  Globe,
 } from "lucide-react";
 import * as icons from "lucide-react";
 
@@ -28,11 +28,19 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
 import { useCustomization } from "@/hooks/useCustomization";
+import { useLanguage } from "@/hooks/useLanguage";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function AppSidebar() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { config } = useCustomization();
+  const { t, language, setLanguage } = useLanguage();
 
   // Get visible navigation items sorted by order
   const visibleNavItems = config.navigation
@@ -82,7 +90,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('main')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavItems.map((item) => {
@@ -94,7 +102,7 @@ export function AppSidebar() {
                       className="flex items-center gap-3 w-full"
                     >
                       <IconComponent className="h-5 w-5 shrink-0" />
-                      <span className="truncate">{item.title}</span>
+                      <span className="truncate">{t(item.id)}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -104,7 +112,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('account')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {secondaryNavItems.map((item) => {
@@ -116,11 +124,29 @@ export function AppSidebar() {
                       className="flex items-center gap-3 w-full"
                     >
                       <IconComponent className="h-5 w-5 shrink-0" />
-                      <span className="truncate">{item.title}</span>
+                      <span className="truncate">{t(item.id)}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
               })}
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton className="flex items-center gap-3 w-full">
+                      <Globe className="h-5 w-5 shrink-0" />
+                      <span className="truncate">{t('language')}</span>
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => setLanguage('en')}>
+                      English {language === 'en' && '✓'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                      العربية {language === 'ar' && '✓'}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -131,7 +157,7 @@ export function AppSidebar() {
                   ) : (
                     <Moon className="h-5 w-5 shrink-0" />
                   )}
-                  <span className="truncate">{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+                  <span className="truncate">{theme === "dark" ? t('light-mode') : t('dark-mode')}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -150,8 +176,8 @@ export function AppSidebar() {
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium truncate">John Doe</p>
-              <p className="text-xs text-muted-foreground truncate">Admin</p>
+              <p className="text-sm font-medium truncate">{t('john-doe')}</p>
+              <p className="text-xs text-muted-foreground truncate">{t('admin')}</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" className="shrink-0">
@@ -162,4 +188,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-

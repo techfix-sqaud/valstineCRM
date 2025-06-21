@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -24,25 +23,28 @@ import {
 import Layout from "@/components/layout";
 import { useCustomization } from "@/hooks/useCustomization";
 import { WorkflowManager } from "@/components/customization/WorkflowManager";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function Customization() {
   const { config, saveConfig } = useCustomization();
+  const { t } = useLanguage();
 
   const handleLayoutChange = (navbarPosition: 'sidebar' | 'top') => {
-    saveConfig({
+    const newConfig = {
       ...config,
       layout: {
         ...config.layout,
         navbarPosition,
       },
-    });
+    };
+    saveConfig(newConfig);
   };
 
   return (
     <Layout
       header={
         <div>
-          <h1 className="text-xl font-bold">System Customization</h1>
+          <h1 className="text-xl font-bold">{t('customization')}</h1>
           <p className="text-sm text-muted-foreground">
             Customize your CRM system to fit your business needs
           </p>
@@ -57,7 +59,7 @@ export default function Customization() {
             <TabsTrigger value="workflows">Workflows</TabsTrigger>
             <TabsTrigger value="navigation">Navigation</TabsTrigger>
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="layout">Layout</TabsTrigger>
+            <TabsTrigger value="layout">{t('layout')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="fields" className="space-y-6">
@@ -155,7 +157,7 @@ export default function Customization() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Navigation Position</h3>
+                  <h3 className="text-lg font-medium">{t('navigation-position')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div
                       className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
@@ -171,7 +173,7 @@ export default function Customization() {
                             <div className="w-2 h-2 rounded-full bg-primary m-0.5" />
                           )}
                         </div>
-                        <h4 className="font-medium">Sidebar Navigation</h4>
+                        <h4 className="font-medium">{t('sidebar-navigation')}</h4>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Traditional sidebar layout with collapsible navigation
@@ -198,7 +200,7 @@ export default function Customization() {
                             <div className="w-2 h-2 rounded-full bg-primary m-0.5" />
                           )}
                         </div>
-                        <h4 className="font-medium">Top Navigation</h4>
+                        <h4 className="font-medium">{t('top-navigation')}</h4>
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Modern top navigation bar with dropdown menus

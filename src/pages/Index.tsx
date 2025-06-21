@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -10,10 +9,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomization } from "@/hooks/useCustomization";
 import * as icons from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Dashboard = () => {
   const { toast } = useToast();
   const { config } = useCustomization();
+  const { t } = useLanguage();
+  
   const [tasks, setTasks] = useState([
     {
       id: 1,
@@ -102,8 +104,8 @@ const Dashboard = () => {
 
   const handleRunAutomation = () => {
     toast({
-      title: "Automation running",
-      description: "Client follow-up emails are being sent",
+      title: t('automation-running'),
+      description: t('client-followup-emails'),
     });
   };
 
@@ -163,13 +165,13 @@ const Dashboard = () => {
       header={
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold">Dashboard</h1>
+            <h1 className="text-xl font-bold">{t('dashboard')}</h1>
             <p className="text-sm text-muted-foreground">
-              Welcome back, here's an overview of your business
+              {t('welcome-back')}
             </p>
           </div>
           <Button onClick={handleRunAutomation} className="hidden sm:flex">
-            Run Automation
+            {t('run-automation')}
           </Button>
         </div>
       }
@@ -183,11 +185,7 @@ const Dashboard = () => {
         {visibleWidgets.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              No widgets configured. Go to{" "}
-              <a href="/customization" className="text-primary hover:underline">
-                System Customization
-              </a>{" "}
-              to add widgets.
+              {t('no-widgets-configured')}
             </p>
           </div>
         )}
