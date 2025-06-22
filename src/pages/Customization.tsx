@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Card,
@@ -27,6 +28,7 @@ import Layout from "@/components/layout";
 import { useCustomization } from "@/hooks/useCustomization";
 import { WorkflowManager } from "@/components/customization/WorkflowManager";
 import { DashboardManager } from "@/components/customization/DashboardManager";
+import { NavigationManager } from "@/components/customization/NavigationManager";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { EntityManager } from "@/components/customization/EntityManager";
