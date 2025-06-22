@@ -45,6 +45,16 @@ export function TopNavbar() {
     return IconComponent || Circle;
   };
 
+  const getItemLabel = (item: any) => {
+    // If it's a custom entity, get the label from the entity configuration
+    if (item.entityType && config.customEntities) {
+      const entity = config.customEntities.find(e => e.name === item.entityType);
+      return entity ? entity.label : item.title;
+    }
+    // For regular items, use translation
+    return t(item.id) || item.title;
+  };
+
   return (
     <nav className="border-b bg-background">
       <div className="flex h-16 items-center justify-between px-4">
@@ -80,7 +90,7 @@ export function TopNavbar() {
                 className="flex items-center gap-2"
               >
                 <IconComponent className="h-4 w-4" />
-                <span>{t(item.id)}</span>
+                <span>{getItemLabel(item)}</span>
               </Button>
             );
           })}
@@ -151,7 +161,7 @@ export function TopNavbar() {
                     className="flex items-center gap-2"
                   >
                     <IconComponent className="h-4 w-4" />
-                    <span>{t(item.id)}</span>
+                    <span>{getItemLabel(item)}</span>
                   </DropdownMenuItem>
                 );
               })}
@@ -202,7 +212,7 @@ export function TopNavbar() {
                         className="w-full justify-start gap-3"
                       >
                         <IconComponent className="h-4 w-4" />
-                        <span>{t(item.id)}</span>
+                        <span>{getItemLabel(item)}</span>
                       </Button>
                     );
                   })}

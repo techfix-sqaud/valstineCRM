@@ -29,6 +29,7 @@ import { useCustomization } from "@/hooks/useCustomization";
 import { WorkflowManager } from "@/components/customization/WorkflowManager";
 import { DashboardManager } from "@/components/customization/DashboardManager";
 import { NavigationManager } from "@/components/customization/NavigationManager";
+import { ViewManager } from "@/components/customization/ViewManager";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
 import { EntityManager } from "@/components/customization/EntityManager";
@@ -121,30 +122,7 @@ export default function Customization() {
           </TabsContent>
 
           <TabsContent value="views" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Views</CardTitle>
-                <CardDescription>
-                  Customize the views for different entities in your CRM
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  {/* Example View */}
-                  <Label htmlFor="defaultView">Default View</Label>
-                  <Select>
-                    <SelectTrigger className="mt-2 w-full">
-                      <SelectValue placeholder="Clients" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="clients">Clients</SelectItem>
-                      <SelectItem value="invoices">Invoices</SelectItem>
-                      <SelectItem value="inventory">Inventory</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
+            <ViewManager />
           </TabsContent>
 
           <TabsContent value="workflows" className="space-y-6">

@@ -99,6 +99,23 @@ export const ViewManager = () => {
     });
   };
 
+  // Get available entity types including custom entities
+  const getAvailableEntityTypes = () => {
+    const defaultTypes = [
+      { value: 'client', label: 'Clients' },
+      { value: 'invoice', label: 'Invoices' },
+      { value: 'inventory', label: 'Inventory' },
+      { value: 'user', label: 'Users' }
+    ];
+    
+    const customTypes = (config.customEntities || []).map(entity => ({
+      value: entity.name,
+      label: entity.label
+    }));
+    
+    return [...defaultTypes, ...customTypes];
+  };
+
   const availableFields = newView.entityType 
     ? config.customFields[newView.entityType] || []
     : [];
@@ -194,10 +211,11 @@ export const ViewManager = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="client">Clients</SelectItem>
-                  <SelectItem value="invoice">Invoices</SelectItem>
-                  <SelectItem value="inventory">Inventory</SelectItem>
-                  <SelectItem value="user">Users</SelectItem>
+                  {getAvailableEntityTypes().map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -222,6 +240,9 @@ export const ViewManager = () => {
                     <Label htmlFor={field.id} className="text-sm">{field.label}</Label>
                   </div>
                 ))}
+                {availableFields.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No fields available for this entity type</p>
+                )}
               </div>
             </div>
 
