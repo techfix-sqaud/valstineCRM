@@ -1,4 +1,3 @@
-
 import { useState, useEffect, createContext, useContext } from 'react';
 
 export type Language = 'en' | 'ar';
@@ -82,7 +81,18 @@ const translations = {
     'create': 'Create',
     'update': 'Update',
     'delete': 'Delete',
-    'configure-automation': 'Configure Automation'
+    'configure-automation': 'Configure Automation',
+    'entities': 'Entities',
+    'add-entity': 'Add Entity',
+    'item-hidden': 'Item Hidden',
+    'item-hidden-message': 'Navigation item has been hidden. You can restore it in Settings > Customization.',
+    'restore': 'Restore',
+    'entity-created': 'Entity Created',
+    'entity-updated': 'Entity Updated',
+    'entity-deleted': 'Entity Deleted',
+    'hide-item': 'Hide Item',
+    'show-item': 'Show Item',
+    'long-press-to-hide': 'Long press to hide',
   },
   ar: {
     dashboard: 'لوحة التحكم',
@@ -155,7 +165,18 @@ const translations = {
     'create': 'إنشاء',
     'update': 'تحديث',
     'delete': 'حذف',
-    'configure-automation': 'تكوين الأتمتة'
+    'configure-automation': 'تكوين الأتمتة',
+    'entities': 'الكيانات',
+    'add-entity': 'إضافة كيان',
+    'item-hidden': 'تم إخفاء العنصر',
+    'item-hidden-message': 'تم إخفاء عنصر التنقل. يمكنك استعادته في الإعدادات > التخصيص.',
+    'restore': 'استعادة',
+    'entity-created': 'تم إنشاء الكيان',
+    'entity-updated': 'تم تحديث الكيان',
+    'entity-deleted': 'تم حذف الكيان',
+    'hide-item': 'إخفاء العنصر',
+    'show-item': 'إظهار العنصر',
+    'long-press-to-hide': 'اضغط مطولاً للإخفاء',
   }
 };
 

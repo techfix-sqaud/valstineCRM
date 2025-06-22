@@ -1,4 +1,3 @@
-
 import {
   LogOut,
   Menu,
@@ -6,8 +5,11 @@ import {
   Sun,
   Circle,
   Globe,
+  EyeOff,
+  Eye,
 } from "lucide-react";
 import * as icons from "lucide-react";
+import { useState, useRef } from "react";
 
 import {
   Sidebar,
@@ -29,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/hooks/use-theme";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,12 +42,14 @@ import {
 export function AppSidebar() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  const { config } = useCustomization();
+  const { config, updateNavigation } = useCustomization();
   const { t, language, setLanguage } = useLanguage();
+  const { toast } = useToast();
+  const [longPressTimers, setLongPressTimers] = useState<Record<string, NodeJS.Timeout>>({});
 
   // Get visible navigation items sorted by order
   const visibleNavItems = config.navigation
-    .filter(item => item.visible)
+    .filter(item => item.visible && !item.isHidden)
     .sort((a, b) => a.order - b.order);
 
   const mainNavItems = visibleNavItems.filter(item => 
@@ -58,6 +63,67 @@ export function AppSidebar() {
   const getIcon = (iconName: string) => {
     const IconComponent = (icons as any)[iconName];
     return IconComponent || Circle;
+  };
+
+  const handleLongPressStart = (itemId: string) => {
+    const timer = setTimeout(() => {
+      const updatedNavigation = config.navigation.map(item =>
+        item.id === itemId ? { ...item, isHidden: true } : item
+      );
+      updateNavigation(updatedNavigation);
+      toast({
+        title: t('item-hidden') || 'Item Hidden',
+        description: t('item-hidden-message') || 'Navigation item has been hidden. You can restore it in Settings > Customization.',
+        action: (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              const restoredNavigation = config.navigation.map(item =>
+                item.id === itemId ? { ...item, isHidden: false } : item
+              );
+              updateNavigation(restoredNavigation);
+            }}
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            {t('restore') || 'Restore'}
+          </Button>
+        ),
+      });
+    }, 1000); // 1 second long press
+
+    setLongPressTimers(prev => ({ ...prev, [itemId]: timer }));
+  };
+
+  const handleLongPressEnd = (itemId: string) => {
+    if (longPressTimers[itemId]) {
+      clearTimeout(longPressTimers[itemId]);
+      setLongPressTimers(prev => {
+        const newTimers = { ...prev };
+        delete newTimers[itemId];
+        return newTimers;
+      });
+    }
+  };
+
+  const renderNavItem = (item: any) => {
+    const IconComponent = getIcon(item.icon);
+    return (
+      <SidebarMenuItem key={item.id}>
+        <SidebarMenuButton
+          onClick={() => navigate(item.path)}
+          onMouseDown={() => handleLongPressStart(item.id)}
+          onMouseUp={() => handleLongPressEnd(item.id)}
+          onMouseLeave={() => handleLongPressEnd(item.id)}
+          onTouchStart={() => handleLongPressStart(item.id)}
+          onTouchEnd={() => handleLongPressEnd(item.id)}
+          className="flex items-center gap-3 w-full select-none"
+        >
+          <IconComponent className="h-5 w-5 shrink-0" />
+          <span className="truncate">{t(item.id)}</span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
   };
 
   return (
@@ -93,20 +159,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>{t('main')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainNavItems.map((item) => {
-                const IconComponent = getIcon(item.icon);
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      onClick={() => navigate(item.path)}
-                      className="flex items-center gap-3 w-full"
-                    >
-                      <IconComponent className="h-5 w-5 shrink-0" />
-                      <span className="truncate">{t(item.id)}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              {mainNavItems.map(renderNavItem)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -115,20 +168,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>{t('account')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {secondaryNavItems.map((item) => {
-                const IconComponent = getIcon(item.icon);
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      onClick={() => navigate(item.path)}
-                      className="flex items-center gap-3 w-full"
-                    >
-                      <IconComponent className="h-5 w-5 shrink-0" />
-                      <span className="truncate">{t(item.id)}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              {secondaryNavItems.map(renderNavItem)}
               <SidebarMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

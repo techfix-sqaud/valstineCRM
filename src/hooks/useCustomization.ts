@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { BusinessConfig, CustomField, ViewConfig, WorkflowConfig, NavigationItem, DashboardWidget } from '@/types/customization';
 
@@ -138,6 +137,7 @@ const defaultConfig: BusinessConfig = {
       config: {}
     }
   ],
+  customEntities: [], // Add this new property
   permissions: {
     admin: ['create', 'read', 'update', 'delete', 'customize'],
     user: ['create', 'read', 'update'],

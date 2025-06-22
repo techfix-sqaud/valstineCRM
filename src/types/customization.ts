@@ -1,4 +1,3 @@
-
 export type FieldType = 'text' | 'email' | 'phone' | 'number' | 'date' | 'select' | 'multiselect' | 'boolean' | 'textarea';
 
 export interface CustomField {
@@ -65,6 +64,8 @@ export interface NavigationItem {
   viewId?: string;
   allowedRoles?: string[];
   requiresAuth?: boolean;
+  entityType?: string; // New: for custom entities
+  isHidden?: boolean; // New: for temporarily hidden items
 }
 
 export interface DashboardWidget {
@@ -78,12 +79,24 @@ export interface DashboardWidget {
   allowedRoles?: string[];
 }
 
+export interface CustomEntity {
+  id: string;
+  name: string;
+  label: string;
+  fields: CustomField[];
+  showInNavigation: boolean;
+  navigationIcon?: string;
+  navigationOrder?: number;
+  visible: boolean;
+}
+
 export interface BusinessConfig {
   customFields: Record<string, CustomField[]>;
   views: ViewConfig[];
   workflows: WorkflowConfig[];
   navigation: NavigationItem[];
   dashboardWidgets: DashboardWidget[];
+  customEntities: CustomEntity[]; // New: for custom entities like wholesalers
   permissions: Record<string, string[]>;
   branding: {
     primaryColor: string;

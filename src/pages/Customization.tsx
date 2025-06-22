@@ -29,6 +29,7 @@ import { WorkflowManager } from "@/components/customization/WorkflowManager";
 import { DashboardManager } from "@/components/customization/DashboardManager";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
+import { EntityManager } from "@/components/customization/EntityManager";
 
 export default function Customization() {
   const { config, saveConfig } = useCustomization();
@@ -89,11 +90,12 @@ export default function Customization() {
     >
       <div className="space-y-6">
         <Tabs defaultValue="fields" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="fields">{t('custom-fields')}</TabsTrigger>
             <TabsTrigger value="views">{t('views')}</TabsTrigger>
             <TabsTrigger value="workflows">{t('workflows')}</TabsTrigger>
             <TabsTrigger value="navigation">{t('navigation')}</TabsTrigger>
+            <TabsTrigger value="entities">{t('entities') || 'Entities'}</TabsTrigger>
             <TabsTrigger value="dashboard">{t('dashboard')}</TabsTrigger>
             <TabsTrigger value="layout">{t('layout')}</TabsTrigger>
           </TabsList>
@@ -148,21 +150,11 @@ export default function Customization() {
           </TabsContent>
 
           <TabsContent value="navigation" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Navigation</CardTitle>
-                <CardDescription>
-                  Customize the navigation menu for your CRM
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  {/* Example Navigation Item */}
-                  <Label htmlFor="dashboardLink">Dashboard Link</Label>
-                  <Input id="dashboardLink" defaultValue="Dashboard" className="mt-2" />
-                </div>
-              </CardContent>
-            </Card>
+            <NavigationManager />
+          </TabsContent>
+
+          <TabsContent value="entities" className="space-y-6">
+            <EntityManager />
           </TabsContent>
 
           <TabsContent value="dashboard" className="space-y-6">
