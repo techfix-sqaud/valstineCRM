@@ -16,6 +16,7 @@ import Settings from "./pages/Settings";
 import Billing from "./pages/Billing";
 import Customization from "./pages/Customization";
 import Profile from "./pages/Profile";
+import EntityPage from "./pages/EntityPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/billing" element={<Billing />} />
               <Route path="/customization" element={<Customization />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/entity/:entityName" element={<EntityPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
