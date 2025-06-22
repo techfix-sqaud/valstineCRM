@@ -19,9 +19,6 @@ export const AnalyticsChart = ({
   dataKey, 
   xAxisKey 
 }: AnalyticsChartProps) => {
-  const ChartComponent = type === 'line' ? LineChart : BarChart;
-  const DataComponent = type === 'line' ? Line : Bar;
-
   return (
     <Card>
       <CardHeader>
@@ -30,18 +27,30 @@ export const AnalyticsChart = ({
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <ChartComponent data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={xAxisKey} />
-            <YAxis />
-            <Tooltip />
-            <DataComponent 
-              dataKey={dataKey} 
-              stroke="hsl(var(--primary))" 
-              fill="hsl(var(--primary))"
-              strokeWidth={2}
-            />
-          </ChartComponent>
+          {type === 'line' ? (
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey={xAxisKey} />
+              <YAxis />
+              <Tooltip />
+              <Line 
+                dataKey={dataKey} 
+                stroke="hsl(var(--primary))" 
+                strokeWidth={2}
+              />
+            </LineChart>
+          ) : (
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey={xAxisKey} />
+              <YAxis />
+              <Tooltip />
+              <Bar 
+                dataKey={dataKey} 
+                fill="hsl(var(--primary))"
+              />
+            </BarChart>
+          )}
         </ResponsiveContainer>
       </CardContent>
     </Card>

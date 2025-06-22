@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { BusinessConfig, CustomField, ViewConfig, WorkflowConfig, NavigationItem, DashboardWidget } from '@/types/customization';
 
@@ -149,6 +150,18 @@ const defaultConfig: BusinessConfig = {
   },
   layout: {
     navbarPosition: 'sidebar',
+  },
+  security: {
+    sessionTimeout: 30,
+    autoLogout: true,
+    maxLoginAttempts: 5,
+  },
+  features: {
+    bulkActions: true,
+    advancedSearch: true,
+    analytics: true,
+    taskManagement: true,
+    clientHistory: true,
   },
 };
 
