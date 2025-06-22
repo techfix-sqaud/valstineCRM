@@ -5,19 +5,26 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { RecentActivities } from "@/components/dashboard/recent-activities";
 import { SalesChart } from "@/components/dashboard/sales-chart";
 import { UpcomingTasks } from "@/components/dashboard/upcoming-tasks";
+import { AnalyticsChart } from "@/components/dashboard/analytics-chart";
+import { AdvancedSearch } from "@/components/search/advanced-search";
+import { TaskManager } from "@/components/tasks/task-manager";
 import { AutomationConfig } from "@/components/automation/AutomationConfig";
-import { Users, FileText, Package, Wallet, Circle } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Users, FileText, Package, Wallet, Circle, TrendingUp, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomization } from "@/hooks/useCustomization";
 import * as icons from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Dashboard = () => {
   const { toast } = useToast();
   const { config } = useCustomization();
   const { t } = useLanguage();
   const [automationConfigOpen, setAutomationConfigOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
   
   const [tasks, setTasks] = useState([
     {
@@ -89,6 +96,22 @@ const Dashboard = () => {
     },
   ];
 
+  // Sample analytics data
+  const salesTrendData = [
+    { month: 'Jan', revenue: 4000, clients: 12 },
+    { month: 'Feb', revenue: 3000, clients: 8 },
+    { month: 'Mar', revenue: 5000, clients: 15 },
+    { month: 'Apr', revenue: 4500, clients: 13 },
+    { month: 'May', revenue: 6000, clients: 18 },
+    { month: 'Jun', revenue: 5500, clients: 16 }
+  ];
+
+  const clientEngagementData = [
+    { category: 'New Clients', value: 24 },
+    { category: 'Returning Clients', value: 56 },
+    { category: 'Inactive Clients', value: 12 }
+  ];
+
   const handleTaskComplete = (id: number, completed: boolean) => {
     setTasks(
       tasks.map((task) =>
@@ -114,6 +137,27 @@ const Dashboard = () => {
     toast({
       title: t('automation-running'),
       description: t('client-followup-emails'),
+    });
+  };
+
+  const handleSearch = (filters: any) => {
+    setIsLoading(true);
+    console.log('Searching with filters:', filters);
+    
+    // Simulate search delay
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Search completed",
+        description: `Found results for "${filters.query || 'all items'}"`,
+      });
+    }, 1000);
+  };
+
+  const handleSearchReset = () => {
+    toast({
+      title: "Filters reset",
+      description: "All search filters have been cleared",
     });
   };
 
@@ -178,25 +222,107 @@ const Dashboard = () => {
               {t('welcome-back')}
             </p>
           </div>
-          <Button onClick={handleRunAutomation} className="hidden sm:flex">
-            {t('run-automation')}
-          </Button>
+          <div className="flex gap-2">
+            {isLoading && <LoadingSpinner size="sm" />}
+            <Button onClick={handleRunAutomation} className="hidden sm:flex">
+              {t('run-automation')}
+            </Button>
+          </div>
         </div>
       }
     >
       <div className="space-y-6">
-        {/* Responsive grid for widgets */}
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-min">
-          {visibleWidgets.map(renderWidget)}
-        </div>
-        
-        {visibleWidgets.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              {t('no-widgets-configured')}
-            </p>
-          </div>
-        )}
+        {/* Advanced Search */}
+        <AdvancedSearch 
+          onSearch={handleSearch}
+          onReset={handleSearchReset}
+          placeholder="Search clients, invoices, inventory..."
+        />
+
+        {/* Main Dashboard Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">{t('dashboard')}</TabsTrigger>
+            <TabsTrigger value="analytics">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="tasks">Task Management</TabsTrigger>
+            <TabsTrigger value="activities">Activities</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Responsive grid for widgets */}
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-min">
+              {visibleWidgets.map(renderWidget)}
+            </div>
+            
+            {visibleWidgets.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  {t('no-widgets-configured')}
+                </p>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+              <AnalyticsChart
+                title="Revenue Trend"
+                description="Monthly revenue and client acquisition"
+                data={salesTrendData}
+                type="line"
+                dataKey="revenue"
+                xAxisKey="month"
+              />
+              <AnalyticsChart
+                title="Client Engagement"
+                description="Client status distribution"
+                data={clientEngagementData}
+                type="bar"
+                dataKey="value"
+                xAxisKey="category"
+              />
+            </div>
+            
+            {/* Performance Metrics */}
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard
+                title="Growth Rate"
+                value="12.5%"
+                icon={<TrendingUp className="h-5 w-5" />}
+                change={{ value: '2.1%', positive: true }}
+              />
+              <StatCard
+                title="Conversion Rate"
+                value="8.3%"
+                icon={<BarChart3 className="h-5 w-5" />}
+                change={{ value: '0.8%', positive: true }}
+              />
+              <StatCard
+                title="Avg Deal Size"
+                value="$2,450"
+                icon={<Wallet className="h-5 w-5" />}
+                change={{ value: '5.2%', positive: false }}
+              />
+              <StatCard
+                title="Customer Lifetime Value"
+                value="$12,300"
+                icon={<Users className="h-5 w-5" />}
+                change={{ value: '15.7%', positive: true }}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="tasks" className="space-y-6">
+            <TaskManager />
+          </TabsContent>
+
+          <TabsContent value="activities" className="space-y-6">
+            <RecentActivities activities={recentActivities} />
+          </TabsContent>
+        </Tabs>
       </div>
       
       <AutomationConfig

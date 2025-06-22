@@ -6,22 +6,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, Plus, Edit, GripVertical, Eye, EyeOff } from "lucide-react";
+import { Trash2, Plus, Edit, GripVertical, Eye, EyeOff, Shield } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { NavigationItem } from "@/types/customization";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const commonIcons = [
   'Home', 'Users', 'FileText', 'Package', 'BarChart3', 'Settings', 'CreditCard',
   'Calendar', 'Mail', 'Phone', 'MapPin', 'Search', 'Plus', 'Minus', 'Edit',
-  'Trash2', 'Eye', 'Heart', 'Star', 'Bookmark', 'Tag', 'Folder', 'File'
+  'Trash2', 'Eye', 'Heart', 'Star', 'Bookmark', 'Tag', 'Folder', 'File',
+  'Shield', 'Lock', 'Globe', 'Clock', 'Bell', 'Chart', 'Database'
 ];
+
+const userRoles = ['admin', 'manager', 'user', 'viewer'];
 
 export const NavigationManager = () => {
   const { config, updateNavigation } = useCustomization();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<NavigationItem | null>(null);
   const [newItem, setNewItem] = useState<Partial<NavigationItem>>({
@@ -29,12 +35,13 @@ export const NavigationManager = () => {
     path: "",
     icon: "Circle",
     visible: true,
+    allowedRoles: ['admin', 'manager', 'user']
   });
 
   const handleSaveItem = () => {
     if (!newItem.title || !newItem.path) {
       toast({
-        title: "Error",
+        title: t('error') || "Error",
         description: "Title and path are required",
         variant: "destructive",
       });
@@ -49,6 +56,7 @@ export const NavigationManager = () => {
       order: editingItem?.order || config.navigation.length + 1,
       visible: newItem.visible ?? true,
       isCustom: true,
+      allowedRoles: newItem.allowedRoles || ['admin']
     };
 
     let updatedNavigation;
@@ -76,12 +84,16 @@ export const NavigationManager = () => {
       path: "",
       icon: "Circle",
       visible: true,
+      allowedRoles: ['admin', 'manager', 'user']
     });
   };
 
   const handleEditItem = (item: NavigationItem) => {
     setEditingItem(item);
-    setNewItem(item);
+    setNewItem({
+      ...item,
+      allowedRoles: item.allowedRoles || ['admin']
+    });
     setIsDialogOpen(true);
   };
 
@@ -118,7 +130,6 @@ export const NavigationManager = () => {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    // Update order numbers
     const updatedNavigation = items.map((item, index) => ({
       ...item,
       order: index + 1
@@ -127,19 +138,37 @@ export const NavigationManager = () => {
     updateNavigation(updatedNavigation);
   };
 
+  const handleRoleToggle = (role: string, checked: boolean) => {
+    const currentRoles = newItem.allowedRoles || [];
+    if (checked) {
+      setNewItem({
+        ...newItem,
+        allowedRoles: [...currentRoles, role]
+      });
+    } else {
+      setNewItem({
+        ...newItem,
+        allowedRoles: currentRoles.filter(r => r !== role)
+      });
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Navigation Management</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Navigation Management
+            </CardTitle>
             <CardDescription>
-              Customize the navigation menu items and their order
+              Customize navigation menu items, their order, and role-based access
             </CardDescription>
           </div>
           <Button onClick={() => setIsDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Item
+            {t('add-item') || 'Add Item'}
           </Button>
         </div>
       </CardHeader>
@@ -156,17 +185,26 @@ export const NavigationManager = () => {
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          className="flex items-center justify-between p-4 border rounded-lg bg-background"
+                          className="flex items-center justify-between p-4 border rounded-lg bg-background hover:bg-accent/50 transition-colors"
                         >
                           <div className="flex items-center gap-4">
                             <div {...provided.dragHandleProps}>
-                              <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                              <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab hover:text-foreground" />
                             </div>
                             <div className="flex items-center gap-3">
                               <span className="text-lg">{item.icon}</span>
                               <div>
                                 <p className="font-medium">{item.title}</p>
                                 <p className="text-sm text-muted-foreground">{item.path}</p>
+                                {item.allowedRoles && (
+                                  <div className="flex gap-1 mt-1">
+                                    {item.allowedRoles.map(role => (
+                                      <span key={role} className="text-xs bg-secondary px-2 py-1 rounded">
+                                        {role}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -175,6 +213,7 @@ export const NavigationManager = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleToggleVisibility(item.id)}
+                              title={item.visible ? "Hide item" : "Show item"}
                             >
                               {item.visible ? (
                                 <Eye className="h-4 w-4" />
@@ -186,6 +225,7 @@ export const NavigationManager = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEditItem(item)}
+                              title="Edit item"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -194,6 +234,7 @@ export const NavigationManager = () => {
                               size="sm"
                               onClick={() => handleDeleteItem(item.id)}
                               disabled={!item.isCustom}
+                              title={!item.isCustom ? "Cannot delete default items" : "Delete item"}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -210,16 +251,16 @@ export const NavigationManager = () => {
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {editingItem ? "Edit Navigation Item" : "Add Navigation Item"}
             </DialogTitle>
             <DialogDescription>
-              Configure the navigation item properties
+              Configure the navigation item properties and access permissions
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-6 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="title" className="text-right">Title</Label>
               <Input
@@ -266,13 +307,38 @@ export const NavigationManager = () => {
                 onCheckedChange={(visible) => setNewItem({ ...newItem, visible })}
               />
             </div>
+            
+            {/* Role-based Access Control */}
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-2">Access Roles</Label>
+              <div className="col-span-3 space-y-2">
+                <p className="text-sm text-muted-foreground mb-3">
+                  Select which user roles can access this navigation item
+                </p>
+                {userRoles.map((role) => (
+                  <div key={role} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`role-${role}`}
+                      checked={(newItem.allowedRoles || []).includes(role)}
+                      onCheckedChange={(checked) => handleRoleToggle(role, !!checked)}
+                    />
+                    <label 
+                      htmlFor={`role-${role}`} 
+                      className="text-sm font-medium capitalize cursor-pointer"
+                    >
+                      {role}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancel
+              {t('cancel') || 'Cancel'}
             </Button>
             <Button onClick={handleSaveItem}>
-              {editingItem ? "Update" : "Create"} Item
+              {editingItem ? t('update') || 'Update' : t('create') || 'Create'} Item
             </Button>
           </DialogFooter>
         </DialogContent>

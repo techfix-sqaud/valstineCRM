@@ -63,16 +63,19 @@ export interface NavigationItem {
   visible: boolean;
   isCustom?: boolean;
   viewId?: string;
+  allowedRoles?: string[];
+  requiresAuth?: boolean;
 }
 
 export interface DashboardWidget {
   id: string;
-  type: 'stat' | 'chart' | 'activity' | 'tasks' | 'custom';
+  type: 'stat' | 'chart' | 'activity' | 'tasks' | 'custom' | 'analytics';
   title: string;
   size: 'small' | 'medium' | 'large';
   position: { x: number; y: number };
   visible: boolean;
   config: any;
+  allowedRoles?: string[];
 }
 
 export interface BusinessConfig {
@@ -91,4 +94,24 @@ export interface BusinessConfig {
   layout: {
     navbarPosition: 'sidebar' | 'top';
   };
+  security: {
+    sessionTimeout: number;
+    autoLogout: boolean;
+    maxLoginAttempts: number;
+  };
+  features: {
+    bulkActions: boolean;
+    advancedSearch: boolean;
+    analytics: boolean;
+    taskManagement: boolean;
+    clientHistory: boolean;
+  };
+}
+
+export interface UserSession {
+  id: string;
+  email: string;
+  role: string;
+  permissions: string[];
+  lastActivity: Date;
 }
