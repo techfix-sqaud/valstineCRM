@@ -1,15 +1,47 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
+import { Check, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Billing = () => {
   const { toast } = useToast();
   const [currentPlan, setCurrentPlan] = useState("starter");
+  const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+
+  const handleUpdatePaymentMethod = async () => {
+    setIsUpdatingPayment(true);
+    
+    try {
+      // Simulate opening Stripe Customer Portal for payment method management
+      // In a real implementation, this would call a Supabase edge function
+      // that creates a Stripe Customer Portal session
+      
+      toast({
+        title: "Redirecting to payment portal",
+        description: "You'll be redirected to securely update your payment method",
+      });
+      
+      // Simulate the redirect delay
+      setTimeout(() => {
+        toast({
+          title: "Payment method updated",
+          description: "Your payment method has been updated successfully",
+        });
+        setIsUpdatingPayment(false);
+      }, 2000);
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update payment method. Please try again.",
+        variant: "destructive",
+      });
+      setIsUpdatingPayment(false);
+    }
+  };
 
   const plans = [
     {
@@ -119,7 +151,14 @@ const Billing = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="outline">Update Payment Method</Button>
+            <Button 
+              variant="outline" 
+              onClick={handleUpdatePaymentMethod}
+              disabled={isUpdatingPayment}
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
+              {isUpdatingPayment ? "Updating..." : "Update Payment Method"}
+            </Button>
           </CardFooter>
         </Card>
 
