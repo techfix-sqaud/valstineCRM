@@ -36,6 +36,7 @@ import { Plus, MoreHorizontal, Search, FileText, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 import { InvoiceView } from "@/components/invoices/InvoiceView";
+import { InvoiceEdit } from "@/components/invoices/InvoiceEdit";
 
 type Invoice = {
   id: string;
@@ -171,7 +172,9 @@ const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceDetails | null>(null);
+  const [editingInvoice, setEditingInvoice] = useState<InvoiceDetails | null>(null);
   const [newInvoice, setNewInvoice] = useState({
     id: "",
     client: "",
@@ -271,6 +274,41 @@ const Invoices = () => {
     }
   };
 
+  const handleEditInvoice = (id: string) => {
+    const invoiceDetails = sampleInvoiceDetails[id];
+    if (invoiceDetails) {
+      setEditingInvoice(invoiceDetails);
+      setIsEditOpen(true);
+    } else {
+      toast({
+        title: "Invoice not found",
+        description: "Unable to load invoice details",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveInvoice = (updatedInvoice: InvoiceDetails) => {
+    // Update the invoice in the main list
+    setInvoices(prevInvoices => 
+      prevInvoices.map(invoice => 
+        invoice.id === updatedInvoice.id 
+          ? {
+              ...invoice,
+              client: updatedInvoice.client,
+              amount: updatedInvoice.amount,
+              status: updatedInvoice.status,
+              date: updatedInvoice.date,
+              dueDate: updatedInvoice.dueDate
+            }
+          : invoice
+      )
+    );
+
+    // Update the sample details
+    sampleInvoiceDetails[updatedInvoice.id] = updatedInvoice;
+  };
+
   return (
     <Layout
       header={
@@ -344,7 +382,9 @@ const Invoices = () => {
                       <DropdownMenuItem onClick={() => handleGenerateInvoice(invoice.id)}>
                         Generate PDF
                       </DropdownMenuItem>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditInvoice(invoice.id)}>
+                        Edit
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDeleteInvoice(invoice.id)}>
                         Delete
                       </DropdownMenuItem>
@@ -468,6 +508,13 @@ const Invoices = () => {
         isOpen={isViewOpen}
         onClose={() => setIsViewOpen(false)}
         invoice={selectedInvoice}
+      />
+
+      <InvoiceEdit
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        invoice={editingInvoice}
+        onSave={handleSaveInvoice}
       />
     </Layout>
   );
