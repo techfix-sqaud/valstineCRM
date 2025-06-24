@@ -64,13 +64,14 @@ const defaultConfig: BusinessConfig = {
   ],
   workflows: [],
   navigation: [
-    { id: 'dashboard', title: 'Dashboard', path: '/', icon: 'Home', order: 1, visible: true },
+    { id: 'dashboard', title: 'Dashboard', path: '/', icon: 'LayoutDashboard', order: 1, visible: true },
     { id: 'clients', title: 'Clients', path: '/clients', icon: 'Users', order: 2, visible: true },
     { id: 'invoices', title: 'Invoices', path: '/invoices', icon: 'FileText', order: 3, visible: true },
     { id: 'inventory', title: 'Inventory', path: '/inventory', icon: 'Package', order: 4, visible: true },
-    { id: 'reports', title: 'Reports', path: '/reports', icon: 'BarChart3', order: 5, visible: true },
-    { id: 'settings', title: 'Settings', path: '/settings', icon: 'Settings', order: 6, visible: true },
-    { id: 'billing', title: 'Billing', path: '/billing', icon: 'CreditCard', order: 7, visible: true },
+    { id: 'pos', title: 'Point of Sale', path: '/pos', icon: 'ShoppingCart', order: 5, visible: true },
+    { id: 'reports', title: 'Reports', path: '/reports', icon: 'BarChart3', order: 6, visible: true },
+    { id: 'settings', title: 'Settings', path: '/settings', icon: 'Settings', order: 7, visible: true },
+    { id: 'billing', title: 'Billing', path: '/billing', icon: 'CreditCard', order: 8, visible: true },
   ],
   dashboardWidgets: [
     {
