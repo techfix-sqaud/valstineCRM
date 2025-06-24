@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout";
 import {
@@ -33,9 +32,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, MoreHorizontal, Search, FileText } from "lucide-react";
+import { Plus, MoreHorizontal, Search, FileText, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import { InvoiceView } from "@/components/invoices/InvoiceView";
 
 type Invoice = {
   id: string;
@@ -44,6 +44,27 @@ type Invoice = {
   status: "paid" | "pending" | "overdue";
   date: string;
   dueDate: string;
+};
+
+type InvoiceDetails = {
+  id: string;
+  client: string;
+  clientAddress: string;
+  amount: string;
+  status: "paid" | "pending" | "overdue";
+  date: string;
+  dueDate: string;
+  items: Array<{
+    id: string;
+    description: string;
+    quantity: number;
+    rate: number;
+    amount: number;
+  }>;
+  notes?: string;
+  subtotal: number;
+  tax: number;
+  total: number;
 };
 
 const initialInvoices: Invoice[] = [
@@ -89,11 +110,68 @@ const initialInvoices: Invoice[] = [
   },
 ];
 
+const sampleInvoiceDetails: { [key: string]: InvoiceDetails } = {
+  "INV-001": {
+    id: "INV-001",
+    client: "Tech Solutions Inc.",
+    clientAddress: "123 Tech Street, Silicon Valley, CA 94101",
+    amount: "$1,250.00",
+    status: "paid",
+    date: "2023-05-10",
+    dueDate: "2023-05-24",
+    items: [
+      { id: "1", description: "Website Development", quantity: 1, rate: 1000, amount: 1000 },
+      { id: "2", description: "SEO Optimization", quantity: 1, rate: 250, amount: 250 }
+    ],
+    notes: "Thank you for choosing our services. Payment terms: Net 30 days.",
+    subtotal: 1250,
+    tax: 0,
+    total: 1250
+  },
+  "INV-002": {
+    id: "INV-002",
+    client: "Digital Marketing Co.",
+    clientAddress: "456 Marketing Ave, New York, NY 10001",
+    amount: "$2,500.00",
+    status: "pending",
+    date: "2023-05-12",
+    dueDate: "2023-05-26",
+    items: [
+      { id: "1", description: "Social Media Management", quantity: 3, rate: 500, amount: 1500 },
+      { id: "2", description: "Content Creation", quantity: 2, rate: 400, amount: 800 },
+      { id: "3", description: "Analytics Setup", quantity: 1, rate: 200, amount: 200 }
+    ],
+    notes: "Monthly retainer for social media services.",
+    subtotal: 2500,
+    tax: 0,
+    total: 2500
+  },
+  "INV-003": {
+    id: "INV-003",
+    client: "Retail Innovations",
+    clientAddress: "789 Retail Blvd, Chicago, IL 60601",
+    amount: "$850.00",
+    status: "overdue",
+    date: "2023-04-25",
+    dueDate: "2023-05-09",
+    items: [
+      { id: "1", description: "E-commerce Setup", quantity: 1, rate: 750, amount: 750 },
+      { id: "2", description: "Training Session", quantity: 1, rate: 100, amount: 100 }
+    ],
+    notes: "Payment is overdue. Please remit payment immediately.",
+    subtotal: 850,
+    tax: 0,
+    total: 850
+  }
+};
+
 const Invoices = () => {
   const { toast } = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>(initialInvoices);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceDetails | null>(null);
   const [newInvoice, setNewInvoice] = useState({
     id: "",
     client: "",
@@ -179,6 +257,20 @@ const Invoices = () => {
     });
   };
 
+  const handleViewInvoice = (id: string) => {
+    const invoiceDetails = sampleInvoiceDetails[id];
+    if (invoiceDetails) {
+      setSelectedInvoice(invoiceDetails);
+      setIsViewOpen(true);
+    } else {
+      toast({
+        title: "Invoice not found",
+        description: "Unable to load invoice details",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Layout
       header={
@@ -245,6 +337,10 @@ const Invoices = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Details
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleGenerateInvoice(invoice.id)}>
                         Generate PDF
                       </DropdownMenuItem>
@@ -367,6 +463,12 @@ const Invoices = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <InvoiceView
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        invoice={selectedInvoice}
+      />
     </Layout>
   );
 };
