@@ -147,19 +147,27 @@
   flex-direction: row-reverse;
 }
 
+/* Fix sidebar positioning in RTL */
+[dir="rtl"] .group-data-\[side\=right\] > :not(.peer) {
+  right: 0;
+  left: auto;
+}
+
+[dir="rtl"] .group-data-\[side\=right\] .group-data-\[collapsible\=offcanvas\] {
+  right: calc(var(--sidebar-width) * -1);
+  left: auto;
+}
+
+/* Ensure main content doesn't have margin issues in RTL */
 [dir="rtl"] .peer {
   margin-left: 0;
-  margin-right: var(--sidebar-width);
+  margin-right: 0;
 }
 
-[dir="rtl"] .group-data-\[side\=right\] .peer {
-  margin-right: 0;
-  margin-left: var(--sidebar-width);
-}
-
-[dir="rtl"] .group-data-\[collapsible\=offcanvas\]:peer {
-  margin-right: 0;
+/* Fix offcanvas state margins in RTL */
+[dir="rtl"] .group-data-\[collapsible\=offcanvas\] .peer {
   margin-left: 0;
+  margin-right: 0;
 }
 
 /* Ensure dropdowns have proper background and z-index */

@@ -1,10 +1,13 @@
-
 import {
   LogOut,
   Menu,
   Moon,
   Sun,
   Globe,
+  User,
+  Settings,
+  CreditCard,
+  ChevronDown,
 } from "lucide-react";
 import * as icons from "lucide-react";
 
@@ -20,6 +23,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
@@ -34,9 +41,9 @@ export function TopNavbar() {
   const { t, language, setLanguage, isRTL } = useLanguage();
   const isMobile = useIsMobile();
 
-  // Get visible navigation items sorted by order
+  // Filter out user menu items from main navigation
   const visibleNavItems = config.navigation
-    .filter(item => item.visible && !item.isHidden)
+    .filter(item => item.visible && !item.isHidden && !['settings', 'billing', 'profile'].includes(item.id))
     .sort((a, b) => a.order - b.order);
 
   const getIcon = (iconName: string) => {
@@ -131,25 +138,7 @@ export function TopNavbar() {
         </div>
 
         <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Globe className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setLanguage('en')}>
-                English {language === 'en' && '✓'}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLanguage('ar')}>
-                العربية {language === 'ar' && '✓'}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLanguage('es')}>
-                Español {language === 'es' && '✓'}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+          {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="icon"
@@ -162,22 +151,77 @@ export function TopNavbar() {
             )}
           </Button>
 
-          <div 
-            className={`flex items-center gap-2 cursor-pointer hover:bg-accent rounded-md p-2 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
-            onClick={() => navigate('/profile')}
-          >
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="/placeholder.svg" alt="User" />
-              <AvatarFallback>JD</AvatarFallback>
-            </Avatar>
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium">{t('john-doe')}</p>
-            </div>
-          </div>
+          {/* User Menu Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div 
+                className={`flex items-center gap-2 cursor-pointer hover:bg-accent rounded-md p-2 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="/placeholder.svg" alt="User" />
+                  <AvatarFallback>JD</AvatarFallback>
+                </Avatar>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium">{t('john-doe') || 'John Doe'}</p>
+                </div>
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-56">
+              {/* User Profile */}
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
+                <User className="mr-2 h-4 w-4" />
+                <span>{t('profile') || 'Profile'}</span>
+              </DropdownMenuItem>
 
-          <Button variant="ghost" size="icon">
-            <LogOut className="h-5 w-5" />
-          </Button>
+              {/* Settings */}
+              <DropdownMenuItem onClick={() => navigate('/settings')}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>{t('settings') || 'Settings'}</span>
+              </DropdownMenuItem>
+
+              {/* Billing */}
+              <DropdownMenuItem onClick={() => navigate('/billing')}>
+                <CreditCard className="mr-2 h-4 w-4" />
+                <span>{t('billing') || 'Billing'}</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Language Submenu */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Globe className="mr-2 h-4 w-4" />
+                  <span>{t('language') || 'Language'}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => setLanguage('en')}>
+                    English {language === 'en' && '✓'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                    العربية {language === 'ar' && '✓'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('es')}>
+                    Español {language === 'es' && '✓'}
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              <DropdownMenuSeparator />
+
+              {/* Logout */}
+              <DropdownMenuItem 
+                onClick={() => {
+                  // Add logout logic here
+                  console.log('Logout clicked');
+                }}
+                className="text-red-600 focus:text-red-600"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>{t('logout') || 'Logout'}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
