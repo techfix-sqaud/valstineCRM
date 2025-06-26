@@ -34,6 +34,7 @@ export function TopNavbar() {
   const { config } = useCustomization();
   const { t, language, setLanguage, isRTL } = useLanguage();
   const isMobile = useIsMobile();
+  const { toggleSidebar } = useSidebar();
 
   // Get visible navigation items sorted by order
   const visibleNavItems = config.navigation
@@ -76,6 +77,13 @@ export function TopNavbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between px-4">
         <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          {/* Mobile sidebar trigger for sidebar layout */}
+          {config.layout.navbarPosition !== 'top' && isMobile && (
+            <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+          
           <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div className="rounded-md bg-crm-blue p-1">
               <div className="h-6 w-6 text-white">
@@ -95,34 +103,39 @@ export function TopNavbar() {
             <span className="text-lg font-bold">{config.branding.companyName}</span>
           </div>
 
-          {isMobile ? (
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side={isRTL ? "right" : "left"}>
-                <MobileNavContent />
-              </SheetContent>
-            </Sheet>
-          ) : (
-            <nav className={`hidden md:flex items-center space-x-6 text-sm font-medium ${isRTL ? 'space-x-reverse' : ''}`}>
-              {visibleNavItems.map((item) => {
-                const IconComponent = getIcon(item.icon);
-                return (
-                  <Button
-                    key={item.id}
-                    variant="ghost"
-                    className={`gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
-                    onClick={() => navigate(item.path)}
-                  >
-                    <IconComponent className="h-4 w-4" />
-                    {getItemLabel(item)}
-                  </Button>
-                );
-              })}
-            </nav>
+          {/* Only show navigation menu for top nav layout */}
+          {config.layout.navbarPosition === 'top' && (
+            <>
+              {isMobile ? (
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side={isRTL ? "right" : "left"}>
+                    <MobileNavContent />
+                  </SheetContent>
+                </Sheet>
+              ) : (
+                <nav className={`hidden md:flex items-center space-x-6 text-sm font-medium ${isRTL ? 'space-x-reverse' : ''}`}>
+                  {visibleNavItems.map((item) => {
+                    const IconComponent = getIcon(item.icon);
+                    return (
+                      <Button
+                        key={item.id}
+                        variant="ghost"
+                        className={`gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+                        onClick={() => navigate(item.path)}
+                      >
+                        <IconComponent className="h-4 w-4" />
+                        {getItemLabel(item)}
+                      </Button>
+                    );
+                  })}
+                </nav>
+              )}
+            </>
           )}
         </div>
 
