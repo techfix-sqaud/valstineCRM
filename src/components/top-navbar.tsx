@@ -1,3 +1,4 @@
+
 import {
   LogOut,
   Menu,
@@ -14,7 +15,6 @@ import { useTheme } from "@/hooks/use-theme";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +33,6 @@ export function TopNavbar() {
   const { config } = useCustomization();
   const { t, language, setLanguage, isRTL } = useLanguage();
   const isMobile = useIsMobile();
-  const { toggleSidebar, setOpenMobile } = useSidebar();
 
   // Get visible navigation items sorted by order
   const visibleNavItems = config.navigation
@@ -76,23 +75,6 @@ export function TopNavbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between px-4">
         <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          {/* Mobile hamburger menu for sidebar layout */}
-          {config.layout.navbarPosition !== 'top' && isMobile && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setOpenMobile(true)}
-              className="md:hidden"
-            >
-              <div className="flex flex-col justify-center items-center w-5 h-5 space-y-1">
-                <div className="w-4 h-0.5 bg-current"></div>
-                <div className="w-4 h-0.5 bg-current"></div>
-                <div className="w-4 h-0.5 bg-current"></div>
-              </div>
-              <span className="sr-only">Open sidebar</span>
-            </Button>
-          )}
-          
           <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div className="rounded-md bg-crm-blue p-1">
               <div className="h-6 w-6 text-white">
