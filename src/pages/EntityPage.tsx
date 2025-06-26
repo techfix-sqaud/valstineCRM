@@ -1,21 +1,48 @@
-
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Package } from "lucide-react";
 import Layout from "@/components/layout";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
 import { CustomEntity, CustomField } from "@/types/customization";
+import { getClientStatusBadgeClasses } from "@/lib/client-status";
 
 interface EntityRecord {
   id: string;
@@ -35,16 +62,18 @@ export default function EntityPage() {
 
   useEffect(() => {
     if (entityName && config.customEntities) {
-      const foundEntity = config.customEntities.find(e => e.name === entityName);
+      const foundEntity = config.customEntities.find(
+        (e) => e.name === entityName
+      );
       setEntity(foundEntity || null);
-      
+
       // Load records from localStorage
       const savedRecords = localStorage.getItem(`entity_${entityName}_records`);
       if (savedRecords) {
         try {
           setRecords(JSON.parse(savedRecords));
         } catch (error) {
-          console.error('Failed to load entity records:', error);
+          console.error("Failed to load entity records:", error);
         }
       }
     }
@@ -52,7 +81,10 @@ export default function EntityPage() {
 
   const saveRecords = (newRecords: EntityRecord[]) => {
     setRecords(newRecords);
-    localStorage.setItem(`entity_${entityName}_records`, JSON.stringify(newRecords));
+    localStorage.setItem(
+      `entity_${entityName}_records`,
+      JSON.stringify(newRecords)
+    );
   };
 
   const handleSaveRecord = () => {
@@ -60,12 +92,14 @@ export default function EntityPage() {
 
     const recordData: EntityRecord = {
       id: editingRecord?.id || `record_${Date.now()}`,
-      ...formData
+      ...formData,
     };
 
     let updatedRecords;
     if (editingRecord) {
-      updatedRecords = records.map(r => r.id === editingRecord.id ? recordData : r);
+      updatedRecords = records.map((r) =>
+        r.id === editingRecord.id ? recordData : r
+      );
       toast({
         title: "Record updated",
         description: `${entity.label} record has been updated`,
@@ -91,7 +125,7 @@ export default function EntityPage() {
   };
 
   const handleDeleteRecord = (recordId: string) => {
-    const updatedRecords = records.filter(r => r.id !== recordId);
+    const updatedRecords = records.filter((r) => r.id !== recordId);
     saveRecords(updatedRecords);
     toast({
       title: "Record deleted",
@@ -100,22 +134,26 @@ export default function EntityPage() {
   };
 
   const renderField = (field: CustomField) => {
-    const value = formData[field.name] || '';
+    const value = formData[field.name] || "";
 
     switch (field.type) {
-      case 'textarea':
+      case "textarea":
         return (
           <Textarea
             value={value}
-            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, [field.name]: e.target.value })
+            }
             placeholder={field.label}
           />
         );
-      case 'select':
+      case "select":
         return (
           <Select
             value={value}
-            onValueChange={(newValue) => setFormData({ ...formData, [field.name]: newValue })}
+            onValueChange={(newValue) =>
+              setFormData({ ...formData, [field.name]: newValue })
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder={`Select ${field.label}`} />
@@ -129,36 +167,50 @@ export default function EntityPage() {
             </SelectContent>
           </Select>
         );
-      case 'boolean':
+      case "boolean":
         return (
           <Checkbox
             checked={!!value}
-            onCheckedChange={(checked) => setFormData({ ...formData, [field.name]: checked })}
+            onCheckedChange={(checked) =>
+              setFormData({ ...formData, [field.name]: checked })
+            }
           />
         );
-      case 'number':
+      case "number":
         return (
           <Input
             type="number"
             value={value}
-            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, [field.name]: e.target.value })
+            }
             placeholder={field.label}
           />
         );
-      case 'date':
+      case "date":
         return (
           <Input
             type="date"
             value={value}
-            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, [field.name]: e.target.value })
+            }
           />
         );
       default:
         return (
           <Input
-            type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
+            type={
+              field.type === "email"
+                ? "email"
+                : field.type === "phone"
+                ? "tel"
+                : "text"
+            }
             value={value}
-            onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, [field.name]: e.target.value })
+            }
             placeholder={field.label}
           />
         );
@@ -180,14 +232,16 @@ export default function EntityPage() {
         <Card>
           <CardContent className="text-center py-8">
             <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">Entity "{entityName}" not found</p>
+            <p className="text-muted-foreground">
+              Entity "{entityName}" not found
+            </p>
           </CardContent>
         </Card>
       </Layout>
     );
   }
 
-  const visibleFields = entity.fields.filter(f => f.visible);
+  const visibleFields = entity.fields.filter((f) => f.visible);
 
   return (
     <Layout
@@ -229,10 +283,26 @@ export default function EntityPage() {
                   <TableRow key={record.id}>
                     {visibleFields.map((field) => (
                       <TableCell key={field.id}>
-                        {field.type === 'boolean' 
-                          ? (record[field.name] ? 'Yes' : 'No')
-                          : record[field.name] || '-'
-                        }
+                        {field.type === "boolean" ? (
+                          record[field.name] ? (
+                            "Yes"
+                          ) : (
+                            "No"
+                          )
+                        ) : field.name === "status" &&
+                          (entity?.name === "client" ||
+                            entity?.name === "clients") ? (
+                          <Badge
+                            variant="outline"
+                            className={getClientStatusBadgeClasses(
+                              record[field.name] || ""
+                            )}
+                          >
+                            {record[field.name] || "-"}
+                          </Badge>
+                        ) : (
+                          record[field.name] || "-"
+                        )}
                       </TableCell>
                     ))}
                     <TableCell>
@@ -260,9 +330,12 @@ export default function EntityPage() {
           ) : (
             <div className="text-center py-8">
               <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No {entity.label.toLowerCase()} found</p>
+              <p className="text-muted-foreground">
+                No {entity.label.toLowerCase()} found
+              </p>
               <p className="text-sm text-muted-foreground">
-                Create your first {entity.label.slice(0, -1).toLowerCase()} to get started
+                Create your first {entity.label.slice(0, -1).toLowerCase()} to
+                get started
               </p>
             </div>
           )}
@@ -274,31 +347,37 @@ export default function EntityPage() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {editingRecord ? 'Edit' : 'Add'} {entity.label.slice(0, -1)}
+              {editingRecord ? "Edit" : "Add"} {entity.label.slice(0, -1)}
             </DialogTitle>
             <DialogDescription>
-              {editingRecord ? 'Update' : 'Create'} a {entity.label.slice(0, -1).toLowerCase()} record
+              {editingRecord ? "Update" : "Create"} a{" "}
+              {entity.label.slice(0, -1).toLowerCase()} record
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             {entity.fields.map((field) => (
-              <div key={field.id} className="grid grid-cols-4 items-center gap-4">
+              <div
+                key={field.id}
+                className="grid grid-cols-4 items-center gap-4"
+              >
                 <Label htmlFor={field.name} className="text-right">
                   {field.label}
-                  {field.required && <span className="text-red-500 ml-1">*</span>}
+                  {field.required && (
+                    <span className="text-red-500 ml-1">*</span>
+                  )}
                 </Label>
-                <div className="col-span-3">
-                  {renderField(field)}
-                </div>
+                <div className="col-span-3">{renderField(field)}</div>
               </div>
             ))}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              {t('cancel') || 'Cancel'}
+              {t("cancel") || "Cancel"}
             </Button>
             <Button onClick={handleSaveRecord}>
-              {editingRecord ? t('update') || 'Update' : t('create') || 'Create'}
+              {editingRecord
+                ? t("update") || "Update"
+                : t("create") || "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>
