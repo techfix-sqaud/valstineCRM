@@ -1,3 +1,4 @@
+
 import {
   LogOut,
   Menu,
@@ -23,6 +24,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,6 +34,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useCustomization } from "@/hooks/useCustomization";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,8 +46,10 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { config, updateNavigation } = useCustomization();
-  const { t, language, setLanguage } = useLanguage();
+  const { t, language, setLanguage, isRTL } = useLanguage();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const { setOpenMobile } = useSidebar();
   const [longPressTimers, setLongPressTimers] = useState<Record<string, NodeJS.Timeout>>({});
 
   // Get visible navigation items sorted by order
@@ -116,12 +121,19 @@ export function AppSidebar() {
     }
   };
 
+  const handleNavItemClick = (path: string) => {
+    navigate(path);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   const renderNavItem = (item: any) => {
     const IconComponent = getIcon(item.icon);
     return (
       <SidebarMenuItem key={item.id}>
         <SidebarMenuButton
-          onClick={() => navigate(item.path)}
+          onClick={() => handleNavItemClick(item.path)}
           onMouseDown={() => handleLongPressStart(item.id)}
           onMouseUp={() => handleLongPressEnd(item.id)}
           onMouseLeave={() => handleLongPressEnd(item.id)}
@@ -137,10 +149,10 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar>
+    <Sidebar side={isRTL ? "right" : "left"}>
       <SidebarHeader className="border-b p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div className="rounded-md bg-crm-blue p-1">
               <div className="h-6 w-6 text-white">
                 <svg
@@ -218,8 +230,11 @@ export function AppSidebar() {
       <SidebarFooter>
         <div className="flex items-center justify-between p-4">
           <div 
-            className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer hover:bg-accent rounded-md p-2 transition-colors"
-            onClick={() => navigate('/profile')}
+            className={`flex items-center gap-3 min-w-0 flex-1 cursor-pointer hover:bg-accent rounded-md p-2 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
+            onClick={() => {
+              navigate('/profile');
+              if (isMobile) setOpenMobile(false);
+            }}
           >
             <Avatar className="shrink-0">
               <AvatarImage src="/placeholder.svg" alt="User" />

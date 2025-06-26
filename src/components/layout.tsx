@@ -4,6 +4,7 @@ import { AppSidebar } from "./app-sidebar";
 import { TopNavbar } from "./top-navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useCustomization } from "@/hooks/useCustomization";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface LayoutProps extends PropsWithChildren {
   header?: ReactNode;
@@ -11,6 +12,7 @@ interface LayoutProps extends PropsWithChildren {
 
 export default function Layout({ children, header }: LayoutProps) {
   const { config } = useCustomization();
+  const { isRTL } = useLanguage();
   const isTopNav = config.layout.navbarPosition === 'top';
 
   if (isTopNav) {
@@ -31,7 +33,7 @@ export default function Layout({ children, header }: LayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className={`min-h-screen flex w-full bg-background ${isRTL ? 'flex-row-reverse' : ''}`}>
         <AppSidebar />
         <div className="flex flex-1 flex-col">
           {header && (

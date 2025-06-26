@@ -1,8 +1,9 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -19,6 +20,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useTheme } from "@/hooks/use-theme";
+import { useToast } from "@/hooks/use-toast";
 
 const salesData = [
   { month: "Jan", revenue: 4000, expenses: 2400 },
@@ -46,17 +48,57 @@ const COLORS = ["#2563eb", "#4f46e5", "#7c3aed", "#db2777", "#dc2626"];
 
 const Reports = () => {
   const { resolvedTheme } = useTheme();
+  const { toast } = useToast();
   const isDark = resolvedTheme === "dark";
   
   const textColor = isDark ? "#cbd5e1" : "#64748b";
   const gridColor = isDark ? "#334155" : "#e2e8f0";
   const backgroundColor = isDark ? "#1e293b" : "#ffffff";
 
+  const exportToCSV = (data: any[], filename: string) => {
+    if (!data.length) return;
+
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => headers.map(header => row[header]).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    toast({
+      title: "Export Successful",
+      description: `${filename} has been exported to CSV.`,
+    });
+  };
+
+  const exportAllData = () => {
+    // Create a comprehensive report
+    const reportData = [
+      { section: 'Sales Data', ...salesData[0] },
+      { section: 'Client Data', ...clientData[0] },
+      { section: 'Inventory Data', ...inventoryData[0] },
+    ];
+    exportToCSV(reportData, 'comprehensive_report');
+  };
+
   return (
     <Layout
       header={
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">Reports & Analytics</h1>
+          <div className="flex gap-2">
+            <Button onClick={exportAllData} variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              Export All
+            </Button>
+          </div>
         </div>
       }
     >
@@ -68,6 +110,17 @@ const Reports = () => {
         </TabsList>
 
         <TabsContent value="sales">
+          <div className="flex justify-end mb-4">
+            <Button 
+              onClick={() => exportToCSV(salesData, 'sales_report')} 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export Sales Data
+            </Button>
+          </div>
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -196,6 +249,17 @@ const Reports = () => {
         </TabsContent>
 
         <TabsContent value="clients">
+          <div className="flex justify-end mb-4">
+            <Button 
+              onClick={() => exportToCSV(clientData, 'client_report')} 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export Client Data
+            </Button>
+          </div>
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -294,6 +358,17 @@ const Reports = () => {
         </TabsContent>
 
         <TabsContent value="inventory">
+          <div className="flex justify-end mb-4">
+            <Button 
+              onClick={() => exportToCSV(inventoryData, 'inventory_report')} 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export Inventory Data
+            </Button>
+          </div>
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
