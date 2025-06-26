@@ -1,4 +1,3 @@
-
 import {
   LogOut,
   Menu,
@@ -162,6 +161,9 @@ export function TopNavbar() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setLanguage('ar')}>
                 العربية {language === 'ar' && '✓'}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('es')}>
+                Español {language === 'es' && '✓'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -1,4 +1,3 @@
-
 import {
   LogOut,
   Menu,
@@ -205,6 +204,9 @@ export function AppSidebar() {
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setLanguage('ar')}>
                       العربية {language === 'ar' && '✓'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLanguage('es')}>
+                      Español {language === 'es' && '✓'}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
