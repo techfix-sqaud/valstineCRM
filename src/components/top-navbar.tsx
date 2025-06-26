@@ -34,7 +34,7 @@ export function TopNavbar() {
   const { config } = useCustomization();
   const { t, language, setLanguage, isRTL } = useLanguage();
   const isMobile = useIsMobile();
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, setOpenMobile } = useSidebar();
 
   // Get visible navigation items sorted by order
   const visibleNavItems = config.navigation
@@ -77,10 +77,20 @@ export function TopNavbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between px-4">
         <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          {/* Mobile sidebar trigger for sidebar layout */}
+          {/* Mobile hamburger menu for sidebar layout */}
           {config.layout.navbarPosition !== 'top' && isMobile && (
-            <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-              <Menu className="h-5 w-5" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setOpenMobile(true)}
+              className="md:hidden"
+            >
+              <div className="flex flex-col justify-center items-center w-5 h-5 space-y-1">
+                <div className="w-4 h-0.5 bg-current"></div>
+                <div className="w-4 h-0.5 bg-current"></div>
+                <div className="w-4 h-0.5 bg-current"></div>
+              </div>
+              <span className="sr-only">Open sidebar</span>
             </Button>
           )}
           

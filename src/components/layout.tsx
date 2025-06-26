@@ -17,7 +17,7 @@ export default function Layout({ children, header }: LayoutProps) {
 
   if (isTopNav) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className={`min-h-screen bg-background ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <TopNavbar />
         <div className="flex flex-col">
           {header && (
@@ -33,15 +33,15 @@ export default function Layout({ children, header }: LayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className={`min-h-screen flex w-full bg-background ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className={`min-h-screen flex w-full bg-background ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <AppSidebar />
-        <div className={`flex flex-1 flex-col min-w-0 ${isRTL ? 'mr-0' : 'ml-0'}`}>
+        <div className="flex flex-1 flex-col min-w-0">
           {header && (
             <header className="sticky top-0 z-10 border-b bg-background p-4">
               {header}
             </header>
           )}
-          <main className={`flex-1 p-6 ${isRTL ? 'pr-6 pl-6' : 'pl-6 pr-6'}`}>{children}</main>
+          <main className="flex-1 p-6">{children}</main>
         </div>
       </div>
     </SidebarProvider>
