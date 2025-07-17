@@ -17,6 +17,7 @@ import Billing from "./pages/Billing";
 import Customization from "./pages/Customization";
 import Profile from "./pages/Profile";
 import EntityPage from "./pages/EntityPage";
+import AITools from "./pages/AITools";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/billing" element={<Billing />} />
               <Route path="/customization" element={<Customization />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/ai-tools" element={<AITools />} />
               <Route path="/entity/:entityName" element={<EntityPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

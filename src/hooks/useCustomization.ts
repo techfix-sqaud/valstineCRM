@@ -70,8 +70,9 @@ const defaultConfig: BusinessConfig = {
     { id: 'inventory', title: 'Inventory', path: '/inventory', icon: 'Package', order: 4, visible: true },
     { id: 'pos', title: 'Point of Sale', path: '/pos', icon: 'ShoppingCart', order: 5, visible: true },
     { id: 'reports', title: 'Reports', path: '/reports', icon: 'BarChart3', order: 6, visible: true },
-    { id: 'settings', title: 'Settings', path: '/settings', icon: 'Settings', order: 7, visible: true },
-    { id: 'billing', title: 'Billing', path: '/billing', icon: 'CreditCard', order: 8, visible: true },
+    { id: 'ai-tools', title: 'AI Tools', path: '/ai-tools', icon: 'Bot', order: 7, visible: true },
+    { id: 'settings', title: 'Settings', path: '/settings', icon: 'Settings', order: 8, visible: true },
+    { id: 'billing', title: 'Billing', path: '/billing', icon: 'CreditCard', order: 9, visible: true },
   ],
   dashboardWidgets: [
     {
