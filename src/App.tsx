@@ -18,6 +18,7 @@ import Customization from "./pages/Customization";
 import Profile from "./pages/Profile";
 import EntityPage from "./pages/EntityPage";
 import AITools from "./pages/AITools";
+import { RepairShop } from "./pages/RepairShop";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/customization" element={<Customization />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/ai-tools" element={<AITools />} />
+              <Route path="/repair-shop" element={<RepairShop />} />
               <Route path="/entity/:entityName" element={<EntityPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
