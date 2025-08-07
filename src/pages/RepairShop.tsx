@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Layout from '@/components/layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ServiceManager } from '@/components/repair-shop/ServiceManager';
 import { TechnicianManager } from '@/components/repair-shop/TechnicianManager';
@@ -9,13 +9,17 @@ import { Wrench, Users, Activity, BarChart3 } from 'lucide-react';
 
 export const RepairShop = () => {
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Repair Shop Management</h1>
-        <p className="text-muted-foreground">
-          Manage services, technicians, and track repair progress for your business
-        </p>
-      </div>
+    <Layout
+      header={
+        <div>
+          <h1 className="text-3xl font-bold">Repair Shop Management</h1>
+          <p className="text-muted-foreground">
+            Manage services, technicians, and track repair progress for your business
+          </p>
+        </div>
+      }
+    >
+      <div className="space-y-6">
 
       <Tabs defaultValue="services" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
@@ -53,6 +57,7 @@ export const RepairShop = () => {
           <RepairAnalytics />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </Layout>
   );
 };
